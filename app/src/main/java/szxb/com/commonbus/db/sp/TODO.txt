@@ -1,0 +1,17 @@
+1.CommonSharedPreferences 公钥列表、AppId、起始站、终点站、票价的保存/获取
+      Key-名称
+  公钥列表
+      key_1:公钥1
+      key_2:公钥2
+  基础设置
+      appId:AppId
+      startStationName:起始站
+      endStationName:终点站
+      ticketPrice:票价
+      DriverCard:司机卡号
+      BluetoothDevice:连接的蓝牙设备名
+      BusPrice：票价
+      snNo:SN号
+
+      lastTimePushFile 上次提交文件到服务器的时间,如果为空说明未提交过,则全查询提交
+
