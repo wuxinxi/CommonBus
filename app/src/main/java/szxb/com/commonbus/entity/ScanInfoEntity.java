@@ -22,6 +22,7 @@ public class ScanInfoEntity {
 
     private String biz_data_single;
 
+    //保存的时间yyyy-MM-dd HH:mm:ss
     private String time;
 
     @Generated(hash = 1652986771)
@@ -69,4 +70,13 @@ public class ScanInfoEntity {
         this.time = time;
     }
 
+    @Override
+    public String toString() {
+        return "ScanInfoEntity{" +
+                "id=" + id +
+                ", status=" + status +
+                ", biz_data_single='" + biz_data_single + '\'' +
+                ", time='" + time + '\'' +
+                '}';
+    }
 }

@@ -10,11 +10,6 @@ package szxb.com.commonbus.db.sp;
 
 public class FetchAppConfig {
 
-    //获取posId
-    public static String posId() {
-        return (String) CommonSharedPreferences.get("posId", "10001");
-    }
-
     //获取appId
     public static String appId() {
         return (String) CommonSharedPreferences.get("appId", "10000002");
@@ -31,8 +26,13 @@ public class FetchAppConfig {
     }
 
     //获取票价
-    public static int ticketPrice() {
-        return (Integer) CommonSharedPreferences.get("ticketPrice", 0);
+    public static String ticketPrice() {
+        return (String) CommonSharedPreferences.get("ticketPrice", "0.00元");
+    }
+
+    //车牌号
+    public static String busNo(){
+        return (String) CommonSharedPreferences.get("busNo", "");
     }
 
     //获取城市编码
@@ -57,7 +57,7 @@ public class FetchAppConfig {
 
     //获取保存公钥时间
     public static String saveKeyTime() {
-        return (String) CommonSharedPreferences.get("save_key_time", "2017-07-13");
+        return (String) CommonSharedPreferences.get("save_key_time", "2017-08-31");
     }
 
     //获取公钥保存状态
@@ -70,24 +70,9 @@ public class FetchAppConfig {
         return (String) CommonSharedPreferences.get("DriverCard", "");
     }
 
-    //连接蓝牙设备号
-    public static String BluetoothDevice() {
-        return (String) CommonSharedPreferences.get("BluetoothDevice", "Xperia Z5 Compact");
-    }
-
-    //票价
-    public static float BusPrice() {
-        return (float) CommonSharedPreferences.get("BusPrice", "2.00");
-    }
-
     //线路号
-    public static String LineName() {
-        return (String) CommonSharedPreferences.get("LineName", "");
-    }
-
-    //车牌号
-    public static String Plate() {
-        return (String) CommonSharedPreferences.get("Plate", "");
+    public static String lineName() {
+        return (String) CommonSharedPreferences.get("lineName", "未设置");
     }
 
     //上次提交文件到服务器的时间，格式：yyyy-MM-dd HH:mm:ss
@@ -97,7 +82,7 @@ public class FetchAppConfig {
 
     //sn号
     public static String snNo() {
-        return (String) CommonSharedPreferences.get("SnNo", "");
+        return (String) CommonSharedPreferences.get("snNo", "");
     }
 
 }

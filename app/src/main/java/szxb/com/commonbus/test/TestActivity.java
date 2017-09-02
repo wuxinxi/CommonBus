@@ -2,17 +2,17 @@ package szxb.com.commonbus.test;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSONObject;
 import com.yanzhenjie.nohttp.rest.Response;
 
 import szxb.com.commonbus.R;
+import szxb.com.commonbus.base.BaseActivity;
+import szxb.com.commonbus.http.CallServer;
+import szxb.com.commonbus.http.HttpListener;
+import szxb.com.commonbus.http.JsonRequest;
 import szxb.com.commonbus.util.comm.Config;
-import szxb.com.poslibrary.http.CallServer;
-import szxb.com.poslibrary.http.HttpListener;
-import szxb.com.poslibrary.http.JsonRequest;
 
 import static szxb.com.commonbus.util.comm.ParamsUtil.getKeyRequestParams;
 
@@ -23,7 +23,7 @@ import static szxb.com.commonbus.util.comm.ParamsUtil.getKeyRequestParams;
  * TODO:车辆信息录入
  */
 
-public class TestActivity extends AppCompatActivity {
+public class TestActivity extends BaseActivity {
 
     String key = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAJQN0rdvPOak5zx+\n" +
             "Vs1kA90zMWlLiYUQDLgQuCleYDUkG5MMdrALciX2SBoUSHBzXz8XqKI5+o7aBmX+\n" +
@@ -43,9 +43,19 @@ public class TestActivity extends AppCompatActivity {
     String url = "http://web.dev.bus.dkh.snsshop.net/api/bus/update";
 
     @Override
+    protected int rootView() {
+        return R.layout.bus_view;
+    }
+
+    @Override
+    protected void initData() {
+
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.bus_view);
 
         String url = Config.getMac_key_url;
 

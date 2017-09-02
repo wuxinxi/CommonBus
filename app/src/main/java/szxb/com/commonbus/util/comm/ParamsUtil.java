@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import szxb.com.commonbus.db.sp.FetchAppConfig;
-import szxb.com.poslibrary.util.sign.ParamSingUtil;
+import szxb.com.commonbus.util.sign.ParamSingUtil;
 
 /**
  * 作者: Tangren on 2017/7/20

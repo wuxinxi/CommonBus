@@ -1,14 +1,20 @@
 package szxb.com.commonbus;
 
+import android.app.Application;
+
 import com.szxb.xblog.AndroidLogAdapter;
 import com.szxb.xblog.CsvFormatStrategy;
 import com.szxb.xblog.DiskLogAdapter;
 import com.szxb.xblog.FormatStrategy;
 import com.szxb.xblog.PrettyFormatStrategy;
 import com.szxb.xblog.XBLog;
+import com.yanzhenjie.nohttp.InitializationConfig;
+import com.yanzhenjie.nohttp.Logger;
+import com.yanzhenjie.nohttp.NoHttp;
+import com.yanzhenjie.nohttp.OkHttpNetworkExecutor;
 
 import szxb.com.commonbus.db.manager.DBCore;
-import szxb.com.poslibrary.LibApp;
+import szxb.com.commonbus.manager.MyActivityLifecycleCallbacks;
 
 /**
  * 作者: Tangren on 2017/8/16
@@ -17,7 +23,7 @@ import szxb.com.poslibrary.LibApp;
  * TODO:一句话描述
  */
 
-public class App extends LibApp {
+public class App extends Application {
 
     private static App instance = null;
     public static final String DB_NAME = "BUS_INFO";
@@ -25,9 +31,14 @@ public class App extends LibApp {
     @Override
     public void onCreate() {
         super.onCreate();
-        instance=this;
+        instance = this;
         initLog();
         DBCore.init(this, DB_NAME);
+        NoHttp.initialize(InitializationConfig.newBuilder(this)
+                .networkExecutor(new OkHttpNetworkExecutor())
+                .build());
+        Logger.setDebug(true);
+        this.registerActivityLifecycleCallbacks(new MyActivityLifecycleCallbacks());
 
     }
 

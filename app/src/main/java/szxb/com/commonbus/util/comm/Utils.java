@@ -5,7 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.text.TextUtils;
 
-
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import szxb.com.commonbus.App;
 
@@ -138,39 +138,37 @@ public class Utils {
 
     /**
      * 根据byte数组，生成文件
-     * @param bfile 文件数组
+     *
+     * @param bfile    文件数组
      * @param filePath 文件存放路径
      * @param fileName 文件名称
      */
-    public static void byte2File(byte[] bfile,String filePath,String fileName){
+    public static void byte2File(byte[] bfile, String filePath, String fileName) {
 
-        BufferedOutputStream bos=null;
-        FileOutputStream fos=null;
-        File file=null;
-        try{
-            File dir=new File(filePath);
-            if(!dir.exists() && !dir.isDirectory()){//判断文件目录是否存在
+        BufferedOutputStream bos = null;
+        FileOutputStream fos = null;
+        File file = null;
+        try {
+            File dir = new File(filePath);
+            if (!dir.exists() && !dir.isDirectory()) {//判断文件目录是否存在
                 dir.mkdirs();
             }
-            file=new File(filePath+fileName);
-            fos=new FileOutputStream(file);
-            bos=new BufferedOutputStream(fos);
+            file = new File(filePath + fileName);
+            fos = new FileOutputStream(file);
+            bos = new BufferedOutputStream(fos);
             bos.write(bfile);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
-        }
-        finally{
-            try{
-                if(bos != null){
+        } finally {
+            try {
+                if (bos != null) {
                     bos.close();
                 }
-                if(fos != null){
+                if (fos != null) {
                     fos.close();
                 }
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();
             }
@@ -178,44 +176,46 @@ public class Utils {
     }
 
 
-
     //打开目录文件
-    public static byte[] File2byte(String filePath)
-    {
+    public static byte[] File2byte(String filePath) {
         byte[] buffer = null;
-        try
-        {
+        try {
 
             File file = new File(filePath);
             FileInputStream fis = new FileInputStream(file);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             byte[] b = new byte[1024];
             int n;
-            while ((n = fis.read(b)) != -1)
-            {
+            while ((n = fis.read(b)) != -1) {
                 bos.write(b, 0, n);
             }
             fis.close();
 
             bos.close();
             buffer = bos.toByteArray();
-        }
-        catch (FileNotFoundException e)
-        {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return buffer;
     }
-    public static byte[] byteMerger(byte[] byte_1, byte[] byte_2){
-        byte[] byte_3 = new byte[byte_1.length+byte_2.length];
+
+    public static byte[] byteMerger(byte[] byte_1, byte[] byte_2) {
+        byte[] byte_3 = new byte[byte_1.length + byte_2.length];
         System.arraycopy(byte_1, 0, byte_3, 0, byte_1.length);
         System.arraycopy(byte_2, 0, byte_3, byte_1.length, byte_2.length);
         return byte_3;
     }
 
+    public static String fen2Yuan(String prices) {
+
+        if (isNumber(prices)) {
+            int i = Integer.valueOf(prices);
+            DecimalFormat format = new DecimalFormat("0.00");
+            return format.format((float) i / (float) 100);
+        }
+        return "0.00元";
+    }
 
 }

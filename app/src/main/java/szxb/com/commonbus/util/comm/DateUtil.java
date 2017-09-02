@@ -22,14 +22,22 @@ public class DateUtil {
 
     private static SimpleDateFormat format_3 = new SimpleDateFormat("yyyy-MM-dd", new Locale("zh", "CN"));
 
-    //得到当前时间：yyyy-MM-dd HH:mm:ss
-    public static String getCurrentTime() {
+
+    //得到当前日期：yyyy-MM-dd HH:mm:ss
+    public static String getCurrentDate() {
         return format.format(new Date());
     }
 
-    //得到当前日期：yyyyMMdd
-    public static String getCurrentDate() {
-        return format.format(new Date());
+    public static String getLastDate(String format) {
+        SimpleDateFormat ft = null;
+        try {
+            ft = new SimpleDateFormat(format, new Locale("zh", "CN"));
+        } catch (Exception e) {
+            return format_3.format(new Date());
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
+        return ft.format(calendar.getTime());
     }
 
     //得到当前日期:yyyy-MM-dd
@@ -53,8 +61,13 @@ public class DateUtil {
         return System.currentTimeMillis() / 1000;
     }
 
+    //long时间戳转换成时间yyyy-MM-dd HH:mm:ss
+    public static String long2String(long time) {
+        return format.format(time);
+    }
+
     //字符串转Date
-    public static Date getLastDate(String lastDateString) {
+    public static Date string2Date(String lastDateString) {
         try {
             return format_3.parse(lastDateString);
         } catch (ParseException e) {

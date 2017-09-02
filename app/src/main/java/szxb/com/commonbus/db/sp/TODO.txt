@@ -12,6 +12,8 @@
       BluetoothDevice:连接的蓝牙设备名
       BusPrice：票价
       snNo:SN号
+      lineName:线路名
+      busNo:车牌号
 
       lastTimePushFile 上次提交文件到服务器的时间,如果为空说明未提交过,则全查询提交
 

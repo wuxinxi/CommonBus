@@ -13,12 +13,12 @@ import org.junit.runner.RunWith;
 import java.util.HashMap;
 import java.util.Map;
 
+import szxb.com.commonbus.http.CallServer;
+import szxb.com.commonbus.http.HttpListener;
+import szxb.com.commonbus.http.JsonRequest;
 import szxb.com.commonbus.util.comm.Config;
 import szxb.com.commonbus.util.comm.ParamsUtil;
-import szxb.com.poslibrary.http.CallServer;
-import szxb.com.poslibrary.http.HttpListener;
-import szxb.com.poslibrary.http.JsonRequest;
-import szxb.com.poslibrary.util.sign.ParamSingUtil;
+import szxb.com.commonbus.util.sign.ParamSingUtil;
 
 /**
  * 作者: Tangren on 2017/8/2

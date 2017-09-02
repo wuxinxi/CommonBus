@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import szxb.com.commonbus.module.HomeActivity;
+import szxb.com.commonbus.module.home.HomeActivity;
 
 
 /**

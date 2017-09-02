@@ -2,6 +2,8 @@
   <dictionary name="Tangren">
     <words>
       <w>commonbus</w>
+      <w>retcode</w>
+      <w>retdata</w>
     </words>
   </dictionary>
 </component>

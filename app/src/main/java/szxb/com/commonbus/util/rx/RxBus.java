@@ -4,6 +4,7 @@ import rx.Observable;
 import rx.subjects.PublishSubject;
 import rx.subjects.SerializedSubject;
 import rx.subjects.Subject;
+import szxb.com.commonbus.entity.SendInfo;
 
 /**
  * 作者: Tangren on 2017/7/31
@@ -42,7 +43,7 @@ public class RxBus {
      *
      * @param o
      */
-    public void send(Object o) {
+    public void send(SendInfo o) {
         bus.onNext(o);
     }
 
@@ -54,7 +55,7 @@ public class RxBus {
      * @return
      */
     public <T> Observable<T> toObservable(Class<T> eventType) {
-        return null;
+        return bus.ofType(eventType);
     }
 
     /**
@@ -64,6 +65,4 @@ public class RxBus {
         return bus.hasObservers();
     }
 
-    public void toObservable() {
-    }
 }

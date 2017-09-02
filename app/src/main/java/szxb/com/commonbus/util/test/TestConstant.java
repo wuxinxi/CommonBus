@@ -18,4 +18,7 @@ public class TestConstant {
     public static byte scaneType = 1;
     public static int in_station_id = 13;
     public static String in_station_name = "桃源站";
+    public static String bus_no = "粤B12548";
+    public static String bus_line_name = "观光4";
+    public static String pos_no = "001";
 }
