@@ -22,15 +22,26 @@ public class ScanInfoEntity {
 
     private String biz_data_single;
 
+    private String mch_trx_id;
+
+    public String getMch_trx_id() {
+        return mch_trx_id;
+    }
+
+    public void setMch_trx_id(String mch_trx_id) {
+        this.mch_trx_id = mch_trx_id;
+    }
+
     //保存的时间yyyy-MM-dd HH:mm:ss
     private String time;
 
-    @Generated(hash = 1652986771)
+    @Generated(hash = 1844689823)
     public ScanInfoEntity(Long id, boolean status, String biz_data_single,
-            String time) {
+            String mch_trx_id, String time) {
         this.id = id;
         this.status = status;
         this.biz_data_single = biz_data_single;
+        this.mch_trx_id = mch_trx_id;
         this.time = time;
     }
 

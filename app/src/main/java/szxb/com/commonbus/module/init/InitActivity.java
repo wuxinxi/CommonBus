@@ -59,7 +59,7 @@ public class InitActivity extends BaseMvpActivity<InitPresenter> {
      *
      * @return map
      */
-    public static  Map<String, Object> getkeyMap() {
+    public static Map<String, Object> getkeyMap() {
         String timestamp = DateUtil.getCurrentDate();
         String app_id = FetchAppConfig.appId();
         Map<String, Object> map = commonMap(app_id, timestamp);
@@ -80,7 +80,7 @@ public class InitActivity extends BaseMvpActivity<InitPresenter> {
         object.put("page_index", 1);
         object.put("page_size", 100);
 
-        object.put("begin_time", DateUtil.getLastDate("yyyy-MM-dd HH:mm:ss"));
+        object.put("begin_time", DateUtil.getBeforeDate(30, "yyyy-MM-dd HH:mm:ss"));
         object.put("end_time", DateUtil.getCurrentDate());
 
         map.put("sign", ParamSingUtil.getSign(app_id, timestamp, object, Config.private_key));
@@ -127,7 +127,6 @@ public class InitActivity extends BaseMvpActivity<InitPresenter> {
 
     @Override
     public void onFail(int what, String str) {
-
         BusToast.showToast(getApplicationContext(), str, false);
     }
 

@@ -1,29 +1,14 @@
 package szxb.com.commonbus.module.home;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.provider.Settings;
-import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.yanzhenjie.nohttp.rest.Response;
-
-import org.greenrobot.greendao.async.AsyncOperation;
-import org.greenrobot.greendao.async.AsyncOperationListener;
-import org.greenrobot.greendao.async.AsyncSession;
-
-import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,42 +17,32 @@ import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import szxb.com.commonbus.App;
 import szxb.com.commonbus.R;
-import szxb.com.commonbus.base.BaseActivity;
-import szxb.com.commonbus.db.manager.DBCore;
-import szxb.com.commonbus.db.sp.CommonSharedPreferences;
+import szxb.com.commonbus.base.BaseMvpActivity;
 import szxb.com.commonbus.db.sp.FetchAppConfig;
-import szxb.com.commonbus.db.table.ScanInfoEntityDao;
-import szxb.com.commonbus.entity.MacKeyEntity;
-import szxb.com.commonbus.entity.PosMessage;
-import szxb.com.commonbus.entity.ScanInfoEntity;
-import szxb.com.commonbus.entity.SendInfo;
-import szxb.com.commonbus.http.CallServer;
-import szxb.com.commonbus.http.HttpListener;
-import szxb.com.commonbus.http.JsonRequest;
+import szxb.com.commonbus.entity.QRCode;
+import szxb.com.commonbus.entity.QRScanMessage;
 import szxb.com.commonbus.task.scan.LoopScanTask;
 import szxb.com.commonbus.task.settle.TimeSettleTask;
+import szxb.com.commonbus.util.comm.Config;
 import szxb.com.commonbus.util.comm.DateUtil;
 import szxb.com.commonbus.util.comm.Utils;
 import szxb.com.commonbus.util.rx.RxBus;
 import szxb.com.commonbus.util.schedule.ThreadScheduledExecutorUtil;
-import szxb.com.commonbus.util.sign.ParamSingUtil;
 import szxb.com.commonbus.util.sound.SoundPoolUtil;
 import szxb.com.commonbus.util.tip.BusToast;
 
-import static szxb.com.commonbus.util.comm.ParamsUtil.commonMap;
-
-public class HomeActivity extends BaseActivity {
+public class HomeActivity extends BaseMvpActivity<HomePresenter> {
 
     private Intent loopScanTaskIntent;
     private Intent timeSettleTaskIntent;
     private Subscription sub;
-    private JsonRequest request;
 
-    private TextView currentTime;
-    private TextView station_name;
-    private TextView bus_line_name;
-    private TextView prices;
+    public TextView currentTime;
+    public TextView station_name;
+    public TextView bus_line_name;
+    public TextView prices;
 
     private MyHandler mHandler;
     private MyBroadcastReceiver mReceiver;
@@ -79,6 +54,10 @@ public class HomeActivity extends BaseActivity {
         return R.layout.bus_view;
     }
 
+    @Override
+    protected HomePresenter getChildPresenter() {
+        return new HomePresenter(this);
+    }
 
     @Override
     protected void initView() {
@@ -101,8 +80,8 @@ public class HomeActivity extends BaseActivity {
         timeSettleTaskIntent = new Intent(this, TimeSettleTask.class);
         startService(loopScanTaskIntent);
         startService(timeSettleTaskIntent);
-        request = new JsonRequest("");
-        receiveNews();
+
+        receiverNews();
 
         mHandler = new MyHandler(this);
         mReceiver = new MyBroadcastReceiver(this);
@@ -111,7 +90,7 @@ public class HomeActivity extends BaseActivity {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                mHandler.sendEmptyMessage(11);
+                mHandler.sendEmptyMessage(QRCode.TIMER);
             }
         }, 0, 1000);
 
@@ -128,202 +107,146 @@ public class HomeActivity extends BaseActivity {
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-    }
-
     //实时扣款
-    private void receiveNews() {
-        sub = RxBus.getInstance().toObservable(SendInfo.class)
-                .filter(new Func1<SendInfo, Boolean>() {
+    private void receiverNews() {
+        sub = RxBus.getInstance().toObservable(QRScanMessage.class)
+                .filter(new Func1<QRScanMessage, Boolean>() {
                     @Override
-                    public Boolean call(SendInfo sendInfo) {
-
-                        switch (sendInfo.getType()) {
-                            case PosMessage.MY_QR_INSTALL_SUCCESS:
-                                mHandler.sendEmptyMessage(PosMessage.MY_QR_INSTALL_SUCCESS);
+                    public Boolean call(QRScanMessage qrScanMessage) {
+                        Log.d("HomeActivity",
+                                "call(HomeActivity.java:114)是否是主线程" + isMainThread());
+                        Log.d("HomeActivity",
+                                "call(HomeActivity.java:117)" + qrScanMessage.toString());
+                        switch (qrScanMessage.getResult()) {
+                            case QRCode.EC_SUCCESS://验码成功
+                                SoundPoolUtil.play(1);
+                                return true;
+                            case QRCode.QR_ERROR://非腾讯或者小兵二维码
+                                SoundPoolUtil.play(4);
+                                BusToast.showToast(App.getInstance(), "二维码有误", false);
                                 break;
-                            case PosMessage.VERIFY_CODE_FAIL:
-                                mHandler.sendEmptyMessage(PosMessage.VERIFY_CODE_FAIL);
+                            case QRCode.SOFTWARE_EXCEPTION:
+                                SoundPoolUtil.play(6);
+                                BusToast.showToast(App.getInstance(), "软件出现异常", false);
                                 break;
-                            case PosMessage.QR_INVALID:
-                                mHandler.sendEmptyMessage(PosMessage.QR_INVALID);
+                            case QRCode.EC_FORMAT://二维码格式错误
+                                SoundPoolUtil.play(7);
+                                BusToast.showToast(App.getInstance(), "二维码格式错误", false);
                                 break;
-                        }
-
-                        return sendInfo.getObject() != null;//过滤非法
-                    }
-                }).subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(new Action1<SendInfo>() {
-                    @Override
-                    public void call(SendInfo sendInfo) {
-                        final JSONObject jsonObject = sendInfo.getObject();
-                        JSONObject object = new JSONObject();
-                        JSONArray order_list = new JSONArray();
-                        order_list.add(jsonObject);
-                        object.put("order_list", order_list);
-
-                        String timestamp = DateUtil.getCurrentDate();
-                        String app_id = FetchAppConfig.appId();
-                        Map<String, Object> map = commonMap(app_id, timestamp);
-                        map.put("sign", ParamSingUtil.getSign(app_id, timestamp, object, ""));
-                        map.put("biz_data", object.toString());
-
-                        request.add(map);
-                        CallServer.getHttpclient().add(0, request, new HttpListener<JSONObject>() {
-                            @Override
-                            public void success(int what, Response<JSONObject> response) {
-
-                                String retcode = response.get().getString("retcode");
-                                if (retcode.equals("0")) {
-                                    String retmsg = response.get().getString("retmsg");
-                                    if (retmsg.equals("ok")) {
-                                        JSONArray result_list = response.get().getJSONArray("result_list");
-                                        JSONObject resultObject = result_list.getJSONObject(0);
-                                        if (resultObject.getString("status").equals("00") || resultObject.getString("status").equals("91")) {
-
-                                            ScanInfoEntityDao dao = DBCore.getDaoSession().getScanInfoEntityDao();
-                                            ScanInfoEntity entity = dao.queryBuilder().where(ScanInfoEntityDao.Properties.Biz_data_single.eq(jsonObject.toJSONString())).build().unique();
-                                            if (entity != null) {
-                                                entity.setStatus(true);
-                                                dao.update(entity);
-                                            }
-                                            Log.d("HomeActivity",
-                                                    "success(HomeActivity.java:108)扣款成功-修改成功!");
-                                        }
-                                    } else {
-                                        //准实时扣款失败
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void fail(int what, String e) {
-
-                            }
-                        });
-
-                    }
-                });
-    }
-
-
-    static class MyHandler extends Handler {
-        private WeakReference<HomeActivity> weakReference;
-
-        public MyHandler(HomeActivity activity) {
-            weakReference = new WeakReference<HomeActivity>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            HomeActivity activity = weakReference.get();
-            if (activity != null) {
-                switch (msg.what) {
-                    case 11:
-                        long sysTime = System.currentTimeMillis();
-                        CharSequence sysTimeStr = DateFormat.format("yyyy-MM-dd HH:mm:ss", sysTime);
-                        activity.currentTime.setText(sysTimeStr);
-                        break;
-                    case PosMessage.MY_QR_INSTALL_SUCCESS:
-                        activity.station_name.setText(FetchAppConfig.startStationName() + "————" + FetchAppConfig.endStationName());
-                        activity.prices.setText(Utils.fen2Yuan(FetchAppConfig.ticketPrice()) + "元");
-                        activity.bus_line_name.setText(FetchAppConfig.lineName());
-                        break;
-                    case PosMessage.VERIFY_CODE_FAIL:
-                        BusToast.showToast(activity, "验码失败", false);
-                        break;
-                    case PosMessage.QR_INVALID:
-                        BusToast.showToast(activity, "无效二维码", false);
-                        break;
-                    default:
-
-                        break;
-                }
-
-            }
-
-        }
-    }
-
-    static class MyBroadcastReceiver extends BroadcastReceiver {
-
-        private WeakReference<HomeActivity> weakReference;
-
-        public MyBroadcastReceiver(HomeActivity activity) {
-            weakReference = new WeakReference<HomeActivity>(activity);
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            HomeActivity activity = weakReference.get();
-            if (activity != null) {
-                if (intent.getAction().equals("com.szxb.bus.notice")) {
-                    String noticeJsonText = intent.getStringExtra("noticeJson");
-                    Log.d("MyBroadcastReceiver",
-                            "onReceive(MyBroadcastReceiver.java:223)" + noticeJsonText);
-                    if (!TextUtils.isEmpty(noticeJsonText)) {
-                        JSONObject noticeJosnObject = JSONObject.parseObject(noticeJsonText);
-                        String flag = noticeJosnObject.getString("flag");
-                        switch (flag) {
-                            case "6"://mac  根秘钥推送
-                                final JSONArray array = noticeJosnObject.getJSONArray("mackey_list");
-                                AsyncSession async = DBCore.getASyncDaoSession();
-                                async.setListener(new AsyncOperationListener() {
-                                    @Override
-                                    public void onAsyncOperationCompleted(AsyncOperation operation) {
-                                        for (int i = 0; i < array.size(); i++) {
-                                            JSONObject object = array.getJSONObject(i);
-                                            object.getString("pubkey");
-                                            MacKeyEntity macKeyEntity = new MacKeyEntity();
-                                            macKeyEntity.setTime(DateUtil.getCurrentDate());
-                                            macKeyEntity.setKey_id(object.getString("key_id"));
-                                            macKeyEntity.setPubkey(object.getString("mac_key"));
-                                            DBCore.getDaoSession().insert(macKeyEntity);
-                                        }
-                                    }
-                                });
-                                async.deleteAll(MacKeyEntity.class);
-                                BusToast.showToast(activity, "MAC更新成功", true);
+                            case QRCode.EC_CARD_PUBLIC_KEY://卡证书公钥错误
+                                SoundPoolUtil.play(8);
+                                BusToast.showToast(App.getInstance(), "卡证书公钥错误", false);
                                 break;
-                            case "5"://线路信息更新推送
-//                            {“flag”:”5”,” bus_no”：”粤 B123456”，” pos_no ”:” SN001”, ” price ”:”2” , ” start_station ”:” 深大” , ” end_station ”:”蛇口” , ” line_name ”:”深蛇线”,”remark”:”备注”}
-
-                                String ticketPrice = noticeJosnObject.getString("price");
-                                String start_station = noticeJosnObject.getString("start_station");
-                                String end_station = noticeJosnObject.getString("end_station");
-                                String line_name = noticeJosnObject.getString("line_name");
-
-                                activity.prices.setText(Utils.fen2Yuan(Integer.valueOf(ticketPrice)) + "元");
-                                activity.station_name.setText(start_station + "————" + end_station);
-                                activity.bus_line_name.setText(line_name);
-
-                                CommonSharedPreferences.put("busNo", noticeJosnObject.getString("bus_no"));
-                                CommonSharedPreferences.put("snNo", noticeJosnObject.getString("pos_no"));
-                                CommonSharedPreferences.put("ticketPrice", ticketPrice);
-                                CommonSharedPreferences.put("startStationName", start_station);
-                                CommonSharedPreferences.put("endStationName", end_station);
-                                CommonSharedPreferences.put("lineName", line_name);
-
-                                BusToast.showToast(activity, "线路信息更新成功", true);
+                            case QRCode.EC_CARD_CERT://卡证书签名错误
+                                SoundPoolUtil.play(9);
+                                BusToast.showToast(App.getInstance(), "卡证书签名错误", false);
                                 break;
+                            case QRCode.EC_USER_PUBLIC_KEY://卡证书用户公钥错误
+                                SoundPoolUtil.play(10);
+                                BusToast.showToast(App.getInstance(), "卡证书用户公钥错误", false);
+                                break;
+                            case QRCode.EC_USER_SIGN://二维码签名错误
+                                SoundPoolUtil.play(11);
+                                BusToast.showToast(App.getInstance(), "二维码签名错误", false);
+                                break;
+                            case QRCode.EC_CARD_CERT_TIME://卡证书过期
+                                SoundPoolUtil.play(12);
+                                BusToast.showToast(App.getInstance(), "卡证书过期", false);
+                                break;
+                            case QRCode.EC_CODE_TIME://二维码过期
+                                SoundPoolUtil.play(13);
+                                BusToast.showToast(App.getInstance(), "二维码过期", false);
+                                break;
+                            case QRCode.EC_FEE://超出最大金额
+                                SoundPoolUtil.play(14);
+                                BusToast.showToast(App.getInstance(), "超出最大金额", false);
+                                break;
+                            case QRCode.EC_BALANCE://余额不足
+                                SoundPoolUtil.play(15);
+                                BusToast.showToast(App.getInstance(), "余额不足", false);
+                                break;
+                            case QRCode.EC_OPEN_ID://输入的openid不符
+                                SoundPoolUtil.play(16);
+                                BusToast.showToast(App.getInstance(), "输入的openid不符", false);
+                                break;
+                            case QRCode.EC_PARAM_ERR://参数错误
+                                SoundPoolUtil.play(17);
+                                BusToast.showToast(App.getInstance(), "参数错误", false);
+                                break;
+                            case QRCode.EC_MEM_ERR://申请内存错误
+                                SoundPoolUtil.play(18);
+                                BusToast.showToast(App.getInstance(), "申请内存错误", false);
+                                break;
+                            case QRCode.EC_CARD_CERT_SIGN_ALG_NOT_SUPPORT://卡证书签名算法不支持
+                                SoundPoolUtil.play(19);
+                                BusToast.showToast(App.getInstance(), "卡证书签名算法不支持", false);
+                                break;
+                            case QRCode.EC_MAC_ROOT_KEY_DECRYPT_ERR://加密的mac根密钥解密失败
+                                SoundPoolUtil.play(20);
+                                BusToast.showToast(App.getInstance(), "加密的mac根密钥解密失败", false);
+                                break;
+                            case QRCode.EC_MAC_SIGN_ERR://mac校验失败
+                                SoundPoolUtil.play(21);
+                                BusToast.showToast(App.getInstance(), "mac校验失败", false);
+                                break;
+                            case QRCode.EC_QRCODE_SIGN_ALG_NOT_SUPPORT://二维码签名算法不支持
+                                SoundPoolUtil.play(22);
+                                BusToast.showToast(App.getInstance(), "二维码签名算法不支持", false);
+                                break;
+                            case QRCode.EC_SCAN_RECORD_ECRYPT_ERR://扫码记录加密失败
+                                SoundPoolUtil.play(23);
+                                BusToast.showToast(App.getInstance(), "扫码记录加密失败", false);
+                                break;
+                            case QRCode.EC_SCAN_RECORD_ECODE_ERR://扫码记录编码失败
+                                SoundPoolUtil.play(24);
+                                BusToast.showToast(App.getInstance(), "扫码记录编码失败", false);
+                                break;
+                            case QRCode.MY_QR_INSTALL_SUCCESS://小兵二维码验证成功
+                                mHandler.sendEmptyMessage(QRCode.MY_QR_INSTALL_SUCCESS);
+                                break;
+                            case QRCode.EC_FAIL://系统异常
+                                SoundPoolUtil.play(25);
+                                BusToast.showToast(App.getInstance(), "系统异常", false);
+                                break;
+
                             default:
 
                                 break;
                         }
+                        return false;
                     }
-                }
-            }
-        }
+                }).subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .subscribe(new Action1<QRScanMessage>() {
+                    @Override
+                    public void call(QRScanMessage qrScanMessage) {
+                        if (qrScanMessage == null) return;
+                        Map<String, Object> map = PosRequest.requestMap(qrScanMessage.getPosRecord());
+                        mPresenter.requestPost(Config.FETCH_DEBIT_WHAT, map, Config.URL);
+                    }
+                });
+
+    }
+
+    @Override
+    public void onSuccess(int what, String str) {
+        super.onSuccess(what, str);
+        Log.d("HomeActivity",
+                "onSuccess(HomeActivity.java:236)准实时扣款成功");
+    }
+
+    @Override
+    public void onFail(int what, String str) {
+        super.onFail(what, str);
+        Log.d("HomeActivity",
+                "onFail(HomeActivity.java:243)准实时扣款失败");
     }
 
     boolean isMainThread() {
         return Looper.getMainLooper() == Looper.myLooper();
     }
+
 
     @Override
     protected void onPause() {

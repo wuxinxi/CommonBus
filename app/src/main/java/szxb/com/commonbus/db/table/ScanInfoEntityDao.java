@@ -27,7 +27,8 @@ public class ScanInfoEntityDao extends AbstractDao<ScanInfoEntity, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Status = new Property(1, boolean.class, "status", false, "STATUS");
         public final static Property Biz_data_single = new Property(2, String.class, "biz_data_single", false, "BIZ_DATA_SINGLE");
-        public final static Property Time = new Property(3, String.class, "time", false, "TIME");
+        public final static Property Mch_trx_id = new Property(3, String.class, "mch_trx_id", false, "MCH_TRX_ID");
+        public final static Property Time = new Property(4, String.class, "time", false, "TIME");
     }
 
 
@@ -46,7 +47,8 @@ public class ScanInfoEntityDao extends AbstractDao<ScanInfoEntity, Long> {
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"STATUS\" INTEGER NOT NULL ," + // 1: status
                 "\"BIZ_DATA_SINGLE\" TEXT," + // 2: biz_data_single
-                "\"TIME\" TEXT);"); // 3: time
+                "\"MCH_TRX_ID\" TEXT," + // 3: mch_trx_id
+                "\"TIME\" TEXT);"); // 4: time
     }
 
     /** Drops the underlying database table. */
@@ -70,9 +72,14 @@ public class ScanInfoEntityDao extends AbstractDao<ScanInfoEntity, Long> {
             stmt.bindString(3, biz_data_single);
         }
  
+        String mch_trx_id = entity.getMch_trx_id();
+        if (mch_trx_id != null) {
+            stmt.bindString(4, mch_trx_id);
+        }
+ 
         String time = entity.getTime();
         if (time != null) {
-            stmt.bindString(4, time);
+            stmt.bindString(5, time);
         }
     }
 
@@ -91,9 +98,14 @@ public class ScanInfoEntityDao extends AbstractDao<ScanInfoEntity, Long> {
             stmt.bindString(3, biz_data_single);
         }
  
+        String mch_trx_id = entity.getMch_trx_id();
+        if (mch_trx_id != null) {
+            stmt.bindString(4, mch_trx_id);
+        }
+ 
         String time = entity.getTime();
         if (time != null) {
-            stmt.bindString(4, time);
+            stmt.bindString(5, time);
         }
     }
 
@@ -108,7 +120,8 @@ public class ScanInfoEntityDao extends AbstractDao<ScanInfoEntity, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getShort(offset + 1) != 0, // status
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // biz_data_single
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // time
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // mch_trx_id
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // time
         );
         return entity;
     }
@@ -118,7 +131,8 @@ public class ScanInfoEntityDao extends AbstractDao<ScanInfoEntity, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setStatus(cursor.getShort(offset + 1) != 0);
         entity.setBiz_data_single(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setTime(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setMch_trx_id(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setTime(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
      }
     
     @Override

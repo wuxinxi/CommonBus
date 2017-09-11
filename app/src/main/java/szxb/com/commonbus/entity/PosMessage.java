@@ -9,7 +9,7 @@ package szxb.com.commonbus.entity;
 
 public class PosMessage {
     //验证二维码失败
-    public static final int VERIFY_CODE_FAIL = 0;
+    public static final int VERIFY_CODE_FAIL = -1;
     //验证成功
      public static final  int VERIFY_CODE_SUCCESS = 1;
     //二维码格式错误

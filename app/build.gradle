@@ -27,7 +27,7 @@ android {
     }
 
     greendao {
-        schemaVersion 4
+        schemaVersion 5
         daoPackage 'szxb.com.commonbus.db.table'
         targetGenDir 'src/main/java'
     }

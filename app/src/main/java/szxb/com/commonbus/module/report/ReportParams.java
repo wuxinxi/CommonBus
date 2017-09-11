@@ -9,8 +9,8 @@ import java.util.Map;
 
 import szxb.com.commonbus.App;
 import szxb.com.commonbus.db.sp.FetchAppConfig;
-import szxb.com.commonbus.entity.PosMessage;
-import szxb.com.commonbus.entity.SendInfo;
+import szxb.com.commonbus.entity.QRCode;
+import szxb.com.commonbus.entity.QRScanMessage;
 import szxb.com.commonbus.http.CallServer;
 import szxb.com.commonbus.http.HttpListener;
 import szxb.com.commonbus.http.JsonRequest;
@@ -50,7 +50,7 @@ public class ReportParams {
                 if (response.get() != null) {
                     String retcode = response.get().getString("retcode");
                     if (retcode.equals("0")) {
-                        RxBus.getInstance().send(new SendInfo(null, PosMessage.MY_QR_INSTALL_SUCCESS));
+                        RxBus.getInstance().send(new QRScanMessage(null, QRCode.MY_QR_INSTALL_SUCCESS));
                         SoundPoolUtil.play(2);
                         BusToast.showToast(App.getInstance(), "机具信息上报成功!", true);
                     } else {

@@ -160,23 +160,27 @@ public class DateUtil {
         return days;
     }
 
-    /*
-    * 将时间戳转换为时间
-    */
-    public static String stampToDate(String s) {
-        String res;
-        long lt = Long.valueOf(s);
-        Date date = new Date(lt);
-        res = format_3.format(date);
-        return res;
+    /**
+     * 当前日期前lastDay的日期
+     *
+     * @param lastDay 相隔天数
+     * @param format  格式
+     * @return
+     */
+    public static String getBeforeDate(int lastDay, String format) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -(lastDay));
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, new Locale("zh", "CN"));
+        return simpleDateFormat.format(calendar.getTime());
     }
 
+    /*
+       * 将时间戳转换为时间
+       */
     public static String times(String time) {
-        SimpleDateFormat sdr = new SimpleDateFormat("yyyy-MM-dd");
-        long lcc = Long.valueOf(time);
+        SimpleDateFormat sdr = new SimpleDateFormat("yyyy-MM-dd", new Locale("zh", "CN"));
         int i = Integer.parseInt(time);
-        String times = sdr.format(new Date(i * 1000L));
-        return times;
+        return sdr.format(new Date(i * 1000L));
 
     }
 

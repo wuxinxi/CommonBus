@@ -4,7 +4,7 @@ import rx.Observable;
 import rx.subjects.PublishSubject;
 import rx.subjects.SerializedSubject;
 import rx.subjects.Subject;
-import szxb.com.commonbus.entity.SendInfo;
+import szxb.com.commonbus.entity.QRScanMessage;
 
 /**
  * 作者: Tangren on 2017/7/31
@@ -43,7 +43,7 @@ public class RxBus {
      *
      * @param o
      */
-    public void send(SendInfo o) {
+    public void send(QRScanMessage o) {
         bus.onNext(o);
     }
 

@@ -39,6 +39,8 @@ public class PosManager implements IPosManage {
     private String inStationName;
     private String orderDesc;
     private byte[] key;
+    private String busNo;
+    private String busLineName;
 
     public PosManager() {
 
@@ -54,6 +56,8 @@ public class PosManager implements IPosManage {
         macKeyEntityList = DBManager.getMacList();
         publicKeyEntityList = DBManager.getPublicKeylist();
         inStationName = FetchAppConfig.startStationName();
+        busNo = FetchAppConfig.busNo();
+        orderDesc = FetchAppConfig.orderDesc();
         key = Base64.decode(Config.private_key, Base64.NO_WRAP);
     }
 
@@ -199,6 +203,17 @@ public class PosManager implements IPosManage {
     public void setKey(String privateKey) {
         byte[] key = Base64.decode(privateKey, Base64.NO_WRAP);
         this.key = key;
+    }
+
+    @Override
+    public String getBusNo() {
+        return busNo;
+    }
+
+    @Override
+    public void setBusNo(String busNo) {
+        this.busNo = busNo;
+        CommonSharedPreferences.put("busNo", busNo);
     }
 
     @Override

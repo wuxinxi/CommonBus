@@ -27,12 +27,12 @@ public class FetchAppConfig {
 
     //获取票价
     public static int ticketPrice() {
-        return (Integer) CommonSharedPreferences.get("ticketPrice",0);
+        return (Integer) CommonSharedPreferences.get("ticketPrice", 0);
     }
 
     //车牌号
     public static String busNo() {
-        return (String) CommonSharedPreferences.get("busNo", "");
+        return (String) CommonSharedPreferences.get("busNo", "00");
     }
 
     //获取城市编码

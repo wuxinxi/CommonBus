@@ -74,24 +74,30 @@ public class BusToast extends Toast {
      * @param text    tip文本
      * @param isOk    更新/检测/扣款成功或者失败
      */
-    public static void showToast(Context context, CharSequence text, boolean isOk) {
-        if (mToast == null) {
-            mToast = showTopay(context, text, isOk);
-            mToast.show();
-            firstTime = System.currentTimeMillis();
-        } else {
-            secondTime = System.currentTimeMillis();
-            if (text.equals(temStr)) {
-                if (secondTime - firstTime > Toast.LENGTH_SHORT) {
+    public static void showToast(final Context context, final CharSequence text, final boolean isOk) {
+        MainLooper.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mToast == null) {
+                    mToast = showTopay(context, text, isOk);
                     mToast.show();
+                    firstTime = System.currentTimeMillis();
+                } else {
+                    secondTime = System.currentTimeMillis();
+                    if (text.equals(temStr)) {
+                        if (secondTime - firstTime > Toast.LENGTH_SHORT) {
+                            mToast.show();
+                        }
+                    } else {
+                        temStr = (String) text;
+                        mToast.setView(getView(isOk, temStr));
+                        mToast.show();
+                    }
                 }
-            } else {
-                temStr = (String) text;
-                mToast.setView(getView(isOk, temStr));
-                mToast.show();
+                firstTime = secondTime;
             }
-        }
-        firstTime = secondTime;
+        });
+
     }
 
 

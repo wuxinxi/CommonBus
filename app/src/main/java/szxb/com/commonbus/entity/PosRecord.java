@@ -14,10 +14,10 @@ public class PosRecord {
     private Long order_time;
     private int total_fee;
     private int pay_fee;
+    private String order_desc;
     private String city_code;
     private int in_station_id;
     private String in_station_name;
-    private int paystatus;
     private String transaction_id;
     private String status;
     private String status_desc;
@@ -25,6 +25,14 @@ public class PosRecord {
     private String bus_no;
     private String bus_line_name;
     private String pos_no;
+
+    public String getOrder_desc() {
+        return order_desc;
+    }
+
+    public void setOrder_desc(String order_desc) {
+        this.order_desc = order_desc;
+    }
 
     public String getOpen_id() {
         return open_id;
@@ -90,14 +98,6 @@ public class PosRecord {
         this.in_station_name = in_station_name;
     }
 
-    public int getPaystatus() {
-        return paystatus;
-    }
-
-    public void setPaystatus(int paystatus) {
-        this.paystatus = paystatus;
-    }
-
     public String getTransaction_id() {
         return transaction_id;
     }
@@ -152,5 +152,27 @@ public class PosRecord {
 
     public void setPos_no(String pos_no) {
         this.pos_no = pos_no;
+    }
+
+    @Override
+    public String toString() {
+        return "PosRecord{" +
+                "open_id='" + open_id + '\'' +
+                ", mch_trx_id='" + mch_trx_id + '\'' +
+                ", order_time=" + order_time +
+                ", total_fee=" + total_fee +
+                ", pay_fee=" + pay_fee +
+                ", order_desc='" + order_desc + '\'' +
+                ", city_code='" + city_code + '\'' +
+                ", in_station_id=" + in_station_id +
+                ", in_station_name='" + in_station_name + '\'' +
+                ", transaction_id='" + transaction_id + '\'' +
+                ", status='" + status + '\'' +
+                ", status_desc='" + status_desc + '\'' +
+                ", record='" + record + '\'' +
+                ", bus_no='" + bus_no + '\'' +
+                ", bus_line_name='" + bus_line_name + '\'' +
+                ", pos_no='" + pos_no + '\'' +
+                '}';
     }
 }

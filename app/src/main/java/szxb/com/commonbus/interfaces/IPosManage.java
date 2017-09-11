@@ -21,6 +21,12 @@ public interface IPosManage {
 
     void setLineName(String var1);
 
+
+    String getBusNo();
+
+    void setBusNo(String busNo);
+
+
     String getLineStart();
 
     void setLineStart(String var1);

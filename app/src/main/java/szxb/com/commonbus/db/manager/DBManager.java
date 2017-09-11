@@ -1,5 +1,7 @@
 package szxb.com.commonbus.db.manager;
 
+import com.alibaba.fastjson.JSONObject;
+
 import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
@@ -103,4 +105,26 @@ public class DBManager {
         return blackEntity != null;
     }
 
+
+    /**
+     * 验码成功,保存数据
+     *
+     * @param object
+     */
+    public static void insert(JSONObject object, String mch_trx_id) {
+        ScanInfoEntity infoEntity = new ScanInfoEntity();
+        infoEntity.setStatus(false);
+        infoEntity.setBiz_data_single(object.toJSONString());
+        infoEntity.setMch_trx_id(mch_trx_id);
+        DBCore.getDaoSession().getScanInfoEntityDao().insert(infoEntity);
+    }
+
+    /**
+     * @return 得到未支付的数据每次最多25条
+     */
+    public static List<ScanInfoEntity> getSwipeList() {
+        ScanInfoEntityDao dao = DBCore.getDaoSession().getScanInfoEntityDao();
+        Query<ScanInfoEntity> qb = dao.queryBuilder().where(ScanInfoEntityDao.Properties.Status.eq(false)).limit(25).build();
+        return qb.list();
+    }
 }

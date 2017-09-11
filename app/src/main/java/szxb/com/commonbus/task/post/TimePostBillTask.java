@@ -55,7 +55,7 @@ public class TimePostBillTask extends Service implements BaseView {
                         "run(TimePostBillTask.java:55)" + swipeList.size());
                 if (swipeList.size() == 0) {
                     Log.d("TimePostBillTask",
-                            "run(TimePostBillTask.java:39)" + swipeList.size());
+                            "run(TimePostBillTask.java:58)" + swipeList.size());
                     return;
                 }
                 JSONObject order_list = new JSONObject();
