@@ -59,7 +59,7 @@ public class InitActivity extends BaseMvpActivity<InitPresenter> {
      *
      * @return map
      */
-    private Map<String, Object> getkeyMap() {
+    public static  Map<String, Object> getkeyMap() {
         String timestamp = DateUtil.getCurrentDate();
         String app_id = FetchAppConfig.appId();
         Map<String, Object> map = commonMap(app_id, timestamp);

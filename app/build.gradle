@@ -13,37 +13,24 @@ android {
         versionName rootProject.ext.android.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+//        ndk {
+//            abiFilters 'armeabi'
+//        }
     }
 
-    signingConfigs {
-        release {
-            storeFile file("H:\\szxb_bus.jks")
-            keyAlias "android"
-            keyPassword "android"
-            storePassword "android"
-        }
-    }
 
     buildTypes {
-        debug {
-            minifyEnabled false
-            shrinkResources false
-            signingConfig signingConfigs.release
-        }
         release {
             minifyEnabled false
-            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
     }
 
     greendao {
-        schemaVersion 2
+        schemaVersion 4
         daoPackage 'szxb.com.commonbus.db.table'
         targetGenDir 'src/main/java'
     }
-
 
 }
 
@@ -52,8 +39,9 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile project(':xblog')
+
     compile files('libs/wlxsdkcore.jar')
+    compile project(':xblog')
     compile rootProject.ext.dependencies["appcompat-v7"]
     testCompile rootProject.ext.dependencies["junit"]
     compile rootProject.ext.dependencies["rxandroid"]
@@ -63,5 +51,5 @@ dependencies {
     compile rootProject.ext.dependencies["materialloadingprogressbar"]
     compile rootProject.ext.dependencies["nohttp:okhttp"]
     compile rootProject.ext.dependencies["fastjson"]
-
+//    compile rootProject.ext.dependencies["aliyun"]
 }

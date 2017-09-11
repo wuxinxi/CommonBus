@@ -26,12 +26,12 @@ public class FetchAppConfig {
     }
 
     //获取票价
-    public static String ticketPrice() {
-        return (String) CommonSharedPreferences.get("ticketPrice", "0.00元");
+    public static int ticketPrice() {
+        return (Integer) CommonSharedPreferences.get("ticketPrice",0);
     }
 
     //车牌号
-    public static String busNo(){
+    public static String busNo() {
         return (String) CommonSharedPreferences.get("busNo", "");
     }
 
@@ -65,14 +65,20 @@ public class FetchAppConfig {
         return (boolean) CommonSharedPreferences.get("save_state", true);
     }
 
-    //司机卡号
-    public static String saveDriver() {
-        return (String) CommonSharedPreferences.get("DriverCard", "");
-    }
 
     //线路号
     public static String lineName() {
         return (String) CommonSharedPreferences.get("lineName", "未设置");
+    }
+
+    //线路号
+    public static String orderDesc() {
+        return (String) CommonSharedPreferences.get("orderDesc", "扫码乘车");
+    }
+
+    //线路ID
+    public static String busLineId() {
+        return (String) CommonSharedPreferences.get("busLineId", "未设置");
     }
 
     //上次提交文件到服务器的时间，格式：yyyy-MM-dd HH:mm:ss

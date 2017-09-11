@@ -160,4 +160,24 @@ public class DateUtil {
         return days;
     }
 
+    /*
+    * 将时间戳转换为时间
+    */
+    public static String stampToDate(String s) {
+        String res;
+        long lt = Long.valueOf(s);
+        Date date = new Date(lt);
+        res = format_3.format(date);
+        return res;
+    }
+
+    public static String times(String time) {
+        SimpleDateFormat sdr = new SimpleDateFormat("yyyy-MM-dd");
+        long lcc = Long.valueOf(time);
+        int i = Integer.parseInt(time);
+        String times = sdr.format(new Date(i * 1000L));
+        return times;
+
+    }
+
 }

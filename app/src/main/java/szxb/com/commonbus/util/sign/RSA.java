@@ -1,5 +1,8 @@
 package szxb.com.commonbus.util.sign;
 
+import android.text.TextUtils;
+import android.util.Base64;
+
 import com.yanzhenjie.nohttp.Logger;
 
 import java.security.KeyFactory;
@@ -13,6 +16,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+import javax.crypto.Cipher;
+
 /**
  * Created by luluma on 2017-04-11 10:21.
  * Email: 316654669@qq.com
@@ -23,6 +28,10 @@ public class RSA {
      * 密钥算法
      */
     private static final String KEY_ALGORITHM = "RSA";
+
+
+    private static final int DEFAULT_BLOCK_SIZE = 128;
+    private static final String DEFAULT_PADDING_ALGORITHM = "RSA/ECB/PKCS1Padding";
 
     /**
      * 签名算法
@@ -91,6 +100,51 @@ public class RSA {
             Logger.e(e.getMessage());
             return null;
         }
+    }
+
+
+    //解密
+    static byte[] decryptData(byte[] encryptedData, byte[]pri_key)
+    {
+        try
+        {
+            int enc_len = encryptedData.length;
+            byte[] tmp = new byte[DEFAULT_BLOCK_SIZE];
+            byte[] result = new byte[enc_len];
+            int nLen = 0;
+            int nPos = 0;
+            Cipher cipher = Cipher.getInstance(DEFAULT_PADDING_ALGORITHM);
+            cipher.init(Cipher.DECRYPT_MODE, getPrivateKey(pri_key));
+            while (enc_len > DEFAULT_BLOCK_SIZE) {
+                System.arraycopy(encryptedData, nPos, tmp, 0, DEFAULT_BLOCK_SIZE);
+                byte[] ret = cipher.doFinal(tmp);
+                System.arraycopy(ret, 0, result, nLen, ret.length);
+                enc_len -= DEFAULT_BLOCK_SIZE;
+                nLen += ret.length;
+                nPos += DEFAULT_BLOCK_SIZE;
+            }
+            System.arraycopy(encryptedData, nPos, tmp, 0, DEFAULT_BLOCK_SIZE);
+            byte[] ret = cipher.doFinal(tmp);
+            System.arraycopy(ret, 0, result, nLen, ret.length);
+            nLen += ret.length;
+            if (nLen < encryptedData.length) {
+                byte[] src = new byte[nLen];
+                System.arraycopy(result, 0, src, 0, nLen);
+                return src;
+            }
+            return result;
+        } catch (Exception e)
+        {
+            return null;
+        }
+    }
+
+    //解密
+    public static String RSADecrypt(String data, byte[] pri_key) {
+        if (TextUtils.isEmpty(data) || pri_key == null) {
+            return "";
+        }
+        return new String(RSA.decryptData(Base64.decode(data,Base64.NO_WRAP), pri_key));
     }
 
     /**

@@ -208,14 +208,43 @@ public class Utils {
         return byte_3;
     }
 
-    public static String fen2Yuan(String prices) {
-
-        if (isNumber(prices)) {
-            int i = Integer.valueOf(prices);
-            DecimalFormat format = new DecimalFormat("0.00");
-            return format.format((float) i / (float) 100);
-        }
-        return "0.00元";
+    public static String fen2Yuan(int prices) {
+        DecimalFormat format = new DecimalFormat("0.00");
+        return format.format((float) prices / (float) 100);
     }
 
+
+    public static int string2Integer(String var) {
+        if (isNumber(var))
+            return new Integer(var);
+        return 0;
+    }
+
+
+
+    public static String bytesToHexString(byte[] src, int len) {
+        StringBuilder stringBuilder = new StringBuilder("");
+        if (src == null || len <= 0) {
+            return null;
+        }
+        for (int i = 0; i < len; i++) {
+            int v = src[i] & 0xFF;
+            String hv = Integer.toHexString(v);
+            if (hv.length() < 2) {
+                stringBuilder.append(0);
+            }
+            stringBuilder.append(hv);
+        }
+        return stringBuilder.toString();
+    }
+
+    public static String hex2IntString(String hex) {
+        int i = Integer.parseInt(hex, 16);
+        return String.valueOf(i);
+    }
+
+
+    public static String getResult2String(byte[] resultByte) {
+        return hex2IntString(bytesToHexString(resultByte, resultByte.length));
+    }
 }

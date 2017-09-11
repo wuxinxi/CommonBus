@@ -1,17 +1,26 @@
 package szxb.com.commonbus.test;
 
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSONObject;
 import com.yanzhenjie.nohttp.rest.Response;
+import com.yanzhenjie.nohttp.rest.SyncRequestExecutor;
 
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func3;
+import rx.schedulers.Schedulers;
 import szxb.com.commonbus.R;
 import szxb.com.commonbus.base.BaseActivity;
 import szxb.com.commonbus.http.CallServer;
 import szxb.com.commonbus.http.HttpListener;
 import szxb.com.commonbus.http.JsonRequest;
+import szxb.com.commonbus.module.init.InitActivity;
 import szxb.com.commonbus.util.comm.Config;
 
 import static szxb.com.commonbus.util.comm.ParamsUtil.getKeyRequestParams;
@@ -59,7 +68,7 @@ public class TestActivity extends BaseActivity {
 
         String url = Config.getMac_key_url;
 
-        JsonRequest request = new JsonRequest(url);
+        final JsonRequest request = new JsonRequest(url);
         request.setRetryCount(3);
         request.add(getKeyRequestParams());
         CallServer.getHttpclient().add(0, request, new HttpListener<JSONObject>() {
@@ -75,7 +84,6 @@ public class TestActivity extends BaseActivity {
                         "fail(PubKeyTest.java:49)" + e);
             }
         });
-
 
 
 //        String app_id = "97263905084014600";
@@ -104,5 +112,74 @@ public class TestActivity extends BaseActivity {
 //            }
 //        });
 
+        Observable<JSONObject> macKey = Observable.create(new Observable.OnSubscribe<JSONObject>() {
+            @Override
+            public void call(Subscriber<? super JSONObject> subscriber) {
+                JsonRequest request1 = new JsonRequest(Config.MAC_KEY);
+                request1.set(InitActivity.getkeyMap());
+                Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(request1);
+                if (execute.isSucceed()) {
+                    subscriber.onNext(execute.get());
+                } else subscriber.onError(execute.getException());
+
+            }
+        });
+
+        Observable<JSONObject> publicKey = Observable.create(new Observable.OnSubscribe<JSONObject>() {
+            @Override
+            public void call(Subscriber<? super JSONObject> subscriber) {
+                JsonRequest request1 = new JsonRequest(Config.PUBLIC_KEY);
+                request1.set(InitActivity.getkeyMap());
+                Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(request1);
+                if (execute.isSucceed()) {
+                    subscriber.onNext(execute.get());
+                } else subscriber.onError(execute.getException());
+            }
+        });
+        Observable<JSONObject> blackList = Observable.create(new Observable.OnSubscribe<JSONObject>() {
+            @Override
+            public void call(Subscriber<? super JSONObject> subscriber) {
+                JsonRequest request1 = new JsonRequest(Config.BLACK_QUERY);
+                request1.set(InitActivity.getBlackListMap());
+                Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(request1);
+                if (execute.isSucceed()) {
+                    subscriber.onNext(execute.get());
+                } else subscriber.onError(execute.getException());
+            }
+        });
+
+
+        Observable.zip(macKey, publicKey, blackList, new Func3<JSONObject, JSONObject, JSONObject, Boolean>() {
+            @Override
+            public Boolean call(JSONObject object, JSONObject object2, JSONObject object3) {
+                Log.d("TestActivity",
+                        "call(TestActivity.java:161)mackey=" + object.toJSONString());
+                Log.d("TestActivity",
+                        "call(TestActivity.java:163)publicKey=" + object2.toJSONString());
+                Log.d("TestActivity",
+                        "call(TestActivity.java:165)blackList=" + object3.toJSONString());
+                Log.d("TestActivity",
+                    "call(TestActivity.java:168)是否是主线程："+isMainThread());
+                return Boolean.TRUE;
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean aBoolean) {
+
+
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.d("TestActivity",
+                                "call(TestActivity.java:174)" + throwable.toString());
+                    }
+                });
+    }
+
+    public boolean isMainThread(){
+        return Looper.getMainLooper()==Looper.myLooper();
     }
 }

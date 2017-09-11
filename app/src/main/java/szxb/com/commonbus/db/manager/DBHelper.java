@@ -8,6 +8,7 @@ import com.github.yuweiguocn.library.greendao.MigrationHelper;
 import szxb.com.commonbus.db.table.BlackListEntityDao;
 import szxb.com.commonbus.db.table.DaoMaster;
 import szxb.com.commonbus.db.table.MacKeyEntityDao;
+import szxb.com.commonbus.db.table.PublicKeyEntityDao;
 import szxb.com.commonbus.db.table.ScanEntityDao;
 import szxb.com.commonbus.db.table.ScanInfoEntityDao;
 
@@ -27,6 +28,6 @@ public class DBHelper extends DaoMaster.OpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         super.onUpgrade(db, oldVersion, newVersion);
-        MigrationHelper.migrate(db, ScanEntityDao.class, BlackListEntityDao.class, ScanInfoEntityDao.class, MacKeyEntityDao.class);
+        MigrationHelper.migrate(db, ScanEntityDao.class, BlackListEntityDao.class, ScanInfoEntityDao.class, MacKeyEntityDao.class, PublicKeyEntityDao.class);
     }
 }

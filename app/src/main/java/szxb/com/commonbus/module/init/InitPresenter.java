@@ -18,6 +18,7 @@ import szxb.com.commonbus.db.manager.DBCore;
 import szxb.com.commonbus.db.sp.CommonSharedPreferences;
 import szxb.com.commonbus.entity.BlackListEntity;
 import szxb.com.commonbus.entity.MacKeyEntity;
+import szxb.com.commonbus.entity.PublicKeyEntity;
 import szxb.com.commonbus.util.comm.Config;
 import szxb.com.commonbus.util.comm.DateUtil;
 
@@ -39,7 +40,7 @@ public class InitPresenter extends BasePresenter {
     @Override
     protected void onAllSuccess(int what, JSONObject result) {
         Log.d("InitPresenter",
-            "onAllSuccess(InitPresenter.java:41)"+result.toJSONString());
+                "onAllSuccess(InitPresenter.java:41)" + result.toJSONString());
         InitActivity activity = weakReference.get();
         if (activity != null) {
             String retmsg = result.getString("retmsg");
@@ -51,6 +52,12 @@ public class InitPresenter extends BasePresenter {
                         JSONArray array = result.getJSONArray("pubkey_list");
                         for (int i = 0; i < array.size(); i++) {
                             JSONObject object = array.getJSONObject(i);
+                            PublicKeyEntity entity = new PublicKeyEntity();
+                            entity.setKey_id(object.getString("key_id"));
+                            entity.setPubkey(object.getString("pubkey"));
+                            DBCore.getDaoSession().insertOrReplace(entity);
+                            Log.d("InitPresenter",
+                                "onAllSuccess(InitPresenter.java:60)"+entity.getKey_id()+","+entity.getPubkey());
                             CommonSharedPreferences.put("key_" + i, object.getString("pubkey"));
                         }
                         activity.onSuccess(what, "获取公钥成功");

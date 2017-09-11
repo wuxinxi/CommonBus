@@ -9,6 +9,7 @@ import java.util.Map;
 
 import szxb.com.commonbus.App;
 import szxb.com.commonbus.db.sp.FetchAppConfig;
+import szxb.com.commonbus.entity.PosMessage;
 import szxb.com.commonbus.entity.SendInfo;
 import szxb.com.commonbus.http.CallServer;
 import szxb.com.commonbus.http.HttpListener;
@@ -18,6 +19,7 @@ import szxb.com.commonbus.util.comm.DateUtil;
 import szxb.com.commonbus.util.comm.ParamsUtil;
 import szxb.com.commonbus.util.rx.RxBus;
 import szxb.com.commonbus.util.sign.ParamSingUtil;
+import szxb.com.commonbus.util.sound.SoundPoolUtil;
 import szxb.com.commonbus.util.tip.BusToast;
 
 /**
@@ -48,10 +50,12 @@ public class ReportParams {
                 if (response.get() != null) {
                     String retcode = response.get().getString("retcode");
                     if (retcode.equals("0")) {
-                        RxBus.getInstance().send(new SendInfo(null, false));
+                        RxBus.getInstance().send(new SendInfo(null, PosMessage.MY_QR_INSTALL_SUCCESS));
+                        SoundPoolUtil.play(2);
                         BusToast.showToast(App.getInstance(), "机具信息上报成功!", true);
                     } else {
                         BusToast.showToast(App.getInstance(), "机具信息上报失败!", false);
+                        SoundPoolUtil.play(3);
                     }
                 }
             }
@@ -60,6 +64,7 @@ public class ReportParams {
             public void fail(int what, String e) {
                 Log.d("ReportParams",
                         "fail(ReportParams.java:62)" + e);
+                SoundPoolUtil.play(3);
                 BusToast.showToast(App.getInstance(), "机具信息上报错误!\n" + e, false);
             }
         });

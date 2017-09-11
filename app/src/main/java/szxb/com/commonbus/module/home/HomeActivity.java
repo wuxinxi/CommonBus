@@ -5,10 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONArray;
@@ -25,7 +29,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -36,6 +39,7 @@ import szxb.com.commonbus.db.sp.CommonSharedPreferences;
 import szxb.com.commonbus.db.sp.FetchAppConfig;
 import szxb.com.commonbus.db.table.ScanInfoEntityDao;
 import szxb.com.commonbus.entity.MacKeyEntity;
+import szxb.com.commonbus.entity.PosMessage;
 import szxb.com.commonbus.entity.ScanInfoEntity;
 import szxb.com.commonbus.entity.SendInfo;
 import szxb.com.commonbus.http.CallServer;
@@ -48,6 +52,7 @@ import szxb.com.commonbus.util.comm.Utils;
 import szxb.com.commonbus.util.rx.RxBus;
 import szxb.com.commonbus.util.schedule.ThreadScheduledExecutorUtil;
 import szxb.com.commonbus.util.sign.ParamSingUtil;
+import szxb.com.commonbus.util.sound.SoundPoolUtil;
 import szxb.com.commonbus.util.tip.BusToast;
 
 import static szxb.com.commonbus.util.comm.ParamsUtil.commonMap;
@@ -67,6 +72,8 @@ public class HomeActivity extends BaseActivity {
     private MyHandler mHandler;
     private MyBroadcastReceiver mReceiver;
 
+    LinearLayout layout;
+
     @Override
     protected int rootView() {
         return R.layout.bus_view;
@@ -79,6 +86,7 @@ public class HomeActivity extends BaseActivity {
         station_name = (TextView) findViewById(R.id.station_name);
         bus_line_name = (TextView) findViewById(R.id.bus_line_name);
         prices = (TextView) findViewById(R.id.prices);
+        layout = (LinearLayout) findViewById(R.id.layout);
     }
 
     @Override
@@ -86,7 +94,7 @@ public class HomeActivity extends BaseActivity {
         //初始化数据
         station_name.setText(FetchAppConfig.startStationName() + "————" + FetchAppConfig.endStationName());
         bus_line_name.setText(FetchAppConfig.lineName());
-        prices.setText(Utils.fen2Yuan(FetchAppConfig.ticketPrice()));
+        prices.setText(Utils.fen2Yuan(FetchAppConfig.ticketPrice()) + "元");
         currentTime.setText(DateUtil.getCurrentDate());
 
         loopScanTaskIntent = new Intent(this, LoopScanTask.class);
@@ -99,20 +107,31 @@ public class HomeActivity extends BaseActivity {
         mHandler = new MyHandler(this);
         mReceiver = new MyBroadcastReceiver(this);
 
-
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                mHandler.sendEmptyMessage(0);
+                mHandler.sendEmptyMessage(11);
             }
         }, 0, 1000);
+
+        registerReceiver(mReceiver, new IntentFilter("com.szxb.bus.notice"));
+
+
+        layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_WIFI_SETTINGS);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mReceiver, new IntentFilter("com.szxb.bus.notice"));
+
     }
 
     //实时扣款
@@ -121,15 +140,22 @@ public class HomeActivity extends BaseActivity {
                 .filter(new Func1<SendInfo, Boolean>() {
                     @Override
                     public Boolean call(SendInfo sendInfo) {
-                        if (!sendInfo.isTransaction()) {
-                            //如果不是交易，则是更新界面消息
-                            station_name.setText(FetchAppConfig.startStationName() + "————" + FetchAppConfig.endStationName());
-                            prices.setText(Utils.fen2Yuan(FetchAppConfig.ticketPrice()) + "元");
-                            bus_line_name.setText(FetchAppConfig.lineName());
+
+                        switch (sendInfo.getType()) {
+                            case PosMessage.MY_QR_INSTALL_SUCCESS:
+                                mHandler.sendEmptyMessage(PosMessage.MY_QR_INSTALL_SUCCESS);
+                                break;
+                            case PosMessage.VERIFY_CODE_FAIL:
+                                mHandler.sendEmptyMessage(PosMessage.VERIFY_CODE_FAIL);
+                                break;
+                            case PosMessage.QR_INVALID:
+                                mHandler.sendEmptyMessage(PosMessage.QR_INVALID);
+                                break;
                         }
+
                         return sendInfo.getObject() != null;//过滤非法
                     }
-                }).subscribeOn(AndroidSchedulers.mainThread())
+                }).subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(new Action1<SendInfo>() {
                     @Override
@@ -197,9 +223,28 @@ public class HomeActivity extends BaseActivity {
             super.handleMessage(msg);
             HomeActivity activity = weakReference.get();
             if (activity != null) {
-                long sysTime = System.currentTimeMillis();
-                CharSequence sysTimeStr = DateFormat.format("yyyy-MM-dd HH:mm:ss", sysTime);
-                activity.currentTime.setText(sysTimeStr);
+                switch (msg.what) {
+                    case 11:
+                        long sysTime = System.currentTimeMillis();
+                        CharSequence sysTimeStr = DateFormat.format("yyyy-MM-dd HH:mm:ss", sysTime);
+                        activity.currentTime.setText(sysTimeStr);
+                        break;
+                    case PosMessage.MY_QR_INSTALL_SUCCESS:
+                        activity.station_name.setText(FetchAppConfig.startStationName() + "————" + FetchAppConfig.endStationName());
+                        activity.prices.setText(Utils.fen2Yuan(FetchAppConfig.ticketPrice()) + "元");
+                        activity.bus_line_name.setText(FetchAppConfig.lineName());
+                        break;
+                    case PosMessage.VERIFY_CODE_FAIL:
+                        BusToast.showToast(activity, "验码失败", false);
+                        break;
+                    case PosMessage.QR_INVALID:
+                        BusToast.showToast(activity, "无效二维码", false);
+                        break;
+                    default:
+
+                        break;
+                }
+
             }
 
         }
@@ -219,7 +264,9 @@ public class HomeActivity extends BaseActivity {
             if (activity != null) {
                 if (intent.getAction().equals("com.szxb.bus.notice")) {
                     String noticeJsonText = intent.getStringExtra("noticeJson");
-                    if (TextUtils.isEmpty(noticeJsonText)) {
+                    Log.d("MyBroadcastReceiver",
+                            "onReceive(MyBroadcastReceiver.java:223)" + noticeJsonText);
+                    if (!TextUtils.isEmpty(noticeJsonText)) {
                         JSONObject noticeJosnObject = JSONObject.parseObject(noticeJsonText);
                         String flag = noticeJosnObject.getString("flag");
                         switch (flag) {
@@ -235,7 +282,7 @@ public class HomeActivity extends BaseActivity {
                                             MacKeyEntity macKeyEntity = new MacKeyEntity();
                                             macKeyEntity.setTime(DateUtil.getCurrentDate());
                                             macKeyEntity.setKey_id(object.getString("key_id"));
-                                            macKeyEntity.setPubkey(object.getString("pubkey"));
+                                            macKeyEntity.setPubkey(object.getString("mac_key"));
                                             DBCore.getDaoSession().insert(macKeyEntity);
                                         }
                                     }
@@ -244,15 +291,14 @@ public class HomeActivity extends BaseActivity {
                                 BusToast.showToast(activity, "MAC更新成功", true);
                                 break;
                             case "5"://线路信息更新推送
-//                            {“flag”:”5”,” bus_no”：”粤 B123456”，” pos_no ”:” SN001”, ” price ”:”2” , ” start_station ”:” 深
-//                                大” , ” end_station ”:”蛇口” , ” line_name ”:”深蛇线”,”remark”:”备注”}
+//                            {“flag”:”5”,” bus_no”：”粤 B123456”，” pos_no ”:” SN001”, ” price ”:”2” , ” start_station ”:” 深大” , ” end_station ”:”蛇口” , ” line_name ”:”深蛇线”,”remark”:”备注”}
 
                                 String ticketPrice = noticeJosnObject.getString("price");
                                 String start_station = noticeJosnObject.getString("start_station");
                                 String end_station = noticeJosnObject.getString("end_station");
                                 String line_name = noticeJosnObject.getString("line_name");
 
-                                activity.prices.setText(Utils.fen2Yuan(ticketPrice) + "元");
+                                activity.prices.setText(Utils.fen2Yuan(Integer.valueOf(ticketPrice)) + "元");
                                 activity.station_name.setText(start_station + "————" + end_station);
                                 activity.bus_line_name.setText(line_name);
 
@@ -275,6 +321,9 @@ public class HomeActivity extends BaseActivity {
         }
     }
 
+    boolean isMainThread() {
+        return Looper.getMainLooper() == Looper.myLooper();
+    }
 
     @Override
     protected void onPause() {
@@ -294,6 +343,8 @@ public class HomeActivity extends BaseActivity {
         }
         if (mHandler != null)
             mHandler.removeCallbacksAndMessages(null);
+
+        SoundPoolUtil.release();
     }
 
 }

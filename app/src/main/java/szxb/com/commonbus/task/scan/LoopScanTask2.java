@@ -146,18 +146,18 @@ public class LoopScanTask2 extends Service {
                         cord.add(record);
                         object.put("record", cord);
                         insert(object);//存储乘车记录
-                        RxBus.getInstance().send(new SendInfo(object,true));
+                        RxBus.getInstance().send(new SendInfo(object,0));
                     } else {
                         //验码失败
                         Log.d("LoopScanTask",
                                 "verifyCode(LoopScanTask.java:139)验码失败");
-                        RxBus.getInstance().send(new SendInfo(null,true));
+                        RxBus.getInstance().send(new SendInfo(null,1));
                     }
 
                 } else {
                     Log.d("LoopScanTask",
                             "verifyCode(LoopScanTask.java:146)验码失败");
-                    RxBus.getInstance().send(new SendInfo(null,true));
+                    RxBus.getInstance().send(new SendInfo(null,1));
                 }
             }
 

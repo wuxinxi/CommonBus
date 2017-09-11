@@ -17,7 +17,7 @@ public class CallServer {
     private DownloadQueue downloadQueue;
 
     private CallServer() {
-        requestQueuequeue = NoHttp.newRequestQueue(5);
+        requestQueuequeue = NoHttp.newRequestQueue(1);
         downloadQueue = NoHttp.newDownloadQueue();
     }
 

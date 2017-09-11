@@ -2,8 +2,6 @@ package szxb.com.commonbus.task.scan;
 
 import android.app.Service;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.SoundPool;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -11,30 +9,30 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.szxb.jni.libtest;
+import com.szxb.jni.libszxb;
 import com.szxb.xblog.XBLog;
 import com.tencent.wlxsdk.WlxSdk;
-import com.yanzhenjie.nohttp.Logger;
 
 import org.greenrobot.greendao.query.Query;
 
 import java.util.concurrent.TimeUnit;
 
-import szxb.com.commonbus.App;
-import szxb.com.commonbus.R;
 import szxb.com.commonbus.db.manager.DBCore;
-import szxb.com.commonbus.db.sp.CommonSharedPreferences;
 import szxb.com.commonbus.db.table.BlackListEntityDao;
 import szxb.com.commonbus.entity.BlackListEntity;
+import szxb.com.commonbus.entity.PosMessage;
 import szxb.com.commonbus.entity.ScanInfoEntity;
 import szxb.com.commonbus.entity.SendInfo;
+import szxb.com.commonbus.interfaces.IPosManage;
+import szxb.com.commonbus.manager.PosManager;
+import szxb.com.commonbus.manager.report.PosScanManager;
 import szxb.com.commonbus.module.report.ReportParams;
-import szxb.com.commonbus.util.comm.Config;
 import szxb.com.commonbus.util.comm.DateUtil;
 import szxb.com.commonbus.util.comm.Des;
 import szxb.com.commonbus.util.comm.Utils;
 import szxb.com.commonbus.util.rx.RxBus;
 import szxb.com.commonbus.util.schedule.ThreadScheduledExecutorUtil;
+import szxb.com.commonbus.util.sound.SoundPoolUtil;
 import szxb.com.commonbus.util.test.TestConstant;
 
 import static szxb.com.commonbus.util.test.TestConstant.pos_id;
@@ -57,113 +55,44 @@ public class LoopScanTask extends Service {
     private String tem = "0";
     private WlxSdk wxSdk;
     private Des des;
-    private static SoundPool soundPool;
-    private static int music;
     ReportParams reportParams = new ReportParams();
+    private static PosManager manager;
 
     @Override
     public void onCreate() {
         super.onCreate();
         wxSdk = new WlxSdk();
         des = new Des();
-        soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
-        music = soundPool.load(App.getInstance(), R.raw.beep2, 1);
+        manager = new PosManager();
+        manager.loadFromPrefs();
         ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 //循环扫码
-                String result = libtest.mytestbarcode();
-                Log.d("LoopScanTask",
-                        "run(LoopScanTask.java:76)" + result);
-                if (!TextUtils.isEmpty(result) && result.length() > 10) {
-                    String szxbStr = result.substring(1, 7);//前1-7位判断二维码
-                    if (szxbStr.equals("000026")) {
-                        //iPhone手机
-                        result = result.substring(7, result.length());
-                        if (tem.equals(result)) return;
-                        Logger.d("二维码数据：" + result);
-                        //进行验证二位的有效性、是否属于黑名单
-                        verifyCode(result);
-
-                    } else if (szxbStr.equals("szxbzn")) {
-                        //下发参数二维码
-                        if (tem.equals(result)) return;
-                        if (result.length() < 56) return;//防止解析出现越界错误，所以多加一层判断
-                        String sign = result.substring(7, 55);
-                        if (TextUtils.equals(des.strDec(sign, Config.DES_KEY), DateUtil.getCurrentDate("yyyy-MM-dd"))) {
-                            try {
-                                String date = des.strDec(result.substring(55, result.length()), Config.DES_KEY);
-                                String params[] = date.split(",");
-                                JSONObject object = new JSONObject();
-
-                                String bus_no = params[0];
-                                String prices = params[1];
-                                String start_station = params[2];
-                                String end_station = params[3];
-                                String line_name = params[4];
-
-                                Log.d("LoopScanTask",
-                                        "run(LoopScanTask.java:106)bus_no=" + bus_no);
-
-                                Log.d("LoopScanTask",
-                                        "run(LoopScanTask.java:108)prices=" + prices);
-
-                                Log.d("LoopScanTask",
-                                        "run(LoopScanTask.java:111)start_station=" + start_station);
-
-                                Log.d("LoopScanTask",
-                                        "run(LoopScanTask.java:114)end_station=" + end_station);
-
-                                Log.d("LoopScanTask",
-                                        "run(LoopScanTask.java:117)line_name=" + line_name);
-
-                                //配置参数
-                                CommonSharedPreferences.put("busNo", bus_no);
-                                CommonSharedPreferences.put("ticketPrice", prices);
-                                CommonSharedPreferences.put("startStationName", start_station);
-                                CommonSharedPreferences.put("endStationName", end_station);
-                                CommonSharedPreferences.put("lineName", line_name);
-
-                                object.put("bus_no", params[0]);
-                                object.put("is_set_pos", "1");
-                                object.put("pos_no", "SN001");
-                                object.put("is_online", "1");
-
-                                object.put("bus_line_id ", 111);
-                                object.put("bus_line_name", line_name);
-                                object.put("line_start", start_station);
-                                object.put("line_end ", end_station);
-                                object.put("total_fee  ", 1);
-                                object.put("pay_fee ", 1);
-
-                                reportParams.report(object);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                byte[] recv = new byte[1024];
+                int barcode = libszxb.getBarcode(recv);
+                if (barcode > 0) {
+                    String result = new String(recv, 0, barcode);
+                    if (TextUtils.equals(result, tem)) return;
+                    try {
+                        if (PosScanManager.isMyQRcode(result)) {
+                            PosScanManager.getInstance().xbposScan(result);
+                        } else if (PosScanManager.isTenQRcode(result)) {
+                            PosScanManager.getInstance().txposScan(result);
+                        } else {
+                            SoundPoolUtil.play(4);
+                            RxBus.getInstance().send(new SendInfo(null, PosMessage.QR_INVALID));
+                            Log.d("LoopScanTask",
+                                    "run(LoopScanTask.java:83)" + result);
                         }
-
-                    } else {
-                        //Android手机二维码
-                        if (tem.equals(result)) return;
-                        verifyCode(result);
+                        tem = result;
+                    } catch (Exception e) {
+                        SoundPoolUtil.play(6);
+                        Log.d("LoopScanTask",
+                                "run(LoopScanTask.java:98)" + e.toString());
+                        e.printStackTrace();
                     }
-
-                    tem = result;
-
                 }
-
-//
-//                if (!TextUtils.isEmpty(result) && result.length() > 7) {
-//                    String msgStr = result.substring(1, 7);
-//                    //判断是否是iPhone,如果是则截取字符串
-//                    if (msgStr.equals("000026"))
-//                        result = result.substring(7, result.length());
-//                    if (tem.equals(result)) return;
-//                    Logger.d("二维码数据：" + result);
-//                    //进行验证二位的有效性、是否属于黑名单
-//                    verifyCode(result);
-//                    tem = result;
-//                }
             }
         }, 500, 200, TimeUnit.MILLISECONDS);
     }
@@ -212,7 +141,7 @@ public class LoopScanTask extends Service {
                     if (verify == 0) {
                         //验证成功
                         XBLog.d("verifyCode(LoopScanTask.java:111)验码成功!");
-                        soundPool.play(music, 1, 1, 0, 0, 1);
+                        SoundPoolUtil.play(1);
                         String record = wxSdk.get_record();
 
                         //转换成JSONObject
@@ -240,22 +169,22 @@ public class LoopScanTask extends Service {
                         cord.add(record);
                         object.put("record", cord);
                         insert(object);//存储乘车记录
-                        RxBus.getInstance().send(new SendInfo(object, true));
+                        RxBus.getInstance().send(new SendInfo(object, 0));
                     } else {
                         //验码失败
                         Log.d("LoopScanTask",
                                 "verifyCode(LoopScanTask.java:139)验码失败");
-                        RxBus.getInstance().send(new SendInfo(null, true));
+                        RxBus.getInstance().send(new SendInfo(null, 4));
                     }
 
                 } else {
                     Log.d("LoopScanTask",
                             "verifyCode(LoopScanTask.java:146)验码失败");
-                    RxBus.getInstance().send(new SendInfo(null, true));
+                    RxBus.getInstance().send(new SendInfo(null, 4));
                 }
             }
 
-        } else RxBus.getInstance().send(null);
+        } else RxBus.getInstance().send(new SendInfo(null, 4));
     }
 
     private void insert(JSONObject object) {
@@ -263,6 +192,11 @@ public class LoopScanTask extends Service {
         infoEntity.setStatus(false);
         infoEntity.setBiz_data_single(object.toJSONString());
         DBCore.getDaoSession().getScanInfoEntityDao().insert(infoEntity);
+    }
+
+
+    public static IPosManage getPosManager() {
+        return manager;
     }
 
 }

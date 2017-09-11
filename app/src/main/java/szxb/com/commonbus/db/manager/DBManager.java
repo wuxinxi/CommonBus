@@ -1,9 +1,17 @@
 package szxb.com.commonbus.db.manager;
 
+import org.greenrobot.greendao.query.Query;
+
 import java.util.List;
 
 import szxb.com.commonbus.db.sp.FetchAppConfig;
+import szxb.com.commonbus.db.table.BlackListEntityDao;
+import szxb.com.commonbus.db.table.MacKeyEntityDao;
+import szxb.com.commonbus.db.table.PublicKeyEntityDao;
 import szxb.com.commonbus.db.table.ScanInfoEntityDao;
+import szxb.com.commonbus.entity.BlackListEntity;
+import szxb.com.commonbus.entity.MacKeyEntity;
+import szxb.com.commonbus.entity.PublicKeyEntity;
 import szxb.com.commonbus.entity.ScanInfoEntity;
 import szxb.com.commonbus.util.comm.DateUtil;
 
@@ -29,6 +37,70 @@ public class DBManager {
         } else {
             return dao.queryBuilder().build().list();
         }
+    }
+
+
+    /**
+     * 获取公钥列表
+     *
+     * @return
+     */
+    public static List<PublicKeyEntity> getPublicKeylist() {
+        PublicKeyEntityDao dao = DBCore.getDaoSession().getPublicKeyEntityDao();
+        return dao.queryBuilder().build().list();
+    }
+
+    /**
+     * 获取公钥
+     *
+     * @param keyId 公钥ID
+     * @return
+     */
+    public static String getPublicKey(String keyId) {
+        PublicKeyEntityDao dao = DBCore.getDaoSession().getPublicKeyEntityDao();
+        PublicKeyEntity unique = dao.queryBuilder().where(PublicKeyEntityDao.Properties.Key_id.eq(keyId)).build().unique();
+        if (unique != null)
+            return unique.getPubkey();
+        return "";
+    }
+
+    /**
+     * 获取mac秘钥列表
+     *
+     * @return
+     */
+    public static List<MacKeyEntity> getMacList() {
+        MacKeyEntityDao dao = DBCore.getDaoSession().getMacKeyEntityDao();
+        return dao.queryBuilder().build().list();
+    }
+
+    /**
+     * 获取mac秘钥
+     *
+     * @param keyId
+     * @return
+     */
+    public static String getMac(String keyId) {
+        MacKeyEntityDao dao = DBCore.getDaoSession().getMacKeyEntityDao();
+        MacKeyEntity unique = dao.queryBuilder().where(MacKeyEntityDao.Properties.Key_id.eq(keyId)).unique();
+        if (unique != null)
+            return unique.getPubkey();
+        return "";
+
+    }
+
+    /**
+     * 是否属于黑名单
+     *
+     * @param openID
+     * @return
+     */
+    public static boolean filterBlackName(String openID) {
+        BlackListEntityDao dao = DBCore.getDaoSession().getBlackListEntityDao();
+        Query<BlackListEntity> build = dao.queryBuilder().where(BlackListEntityDao.Properties.Open_id.eq(openID),
+                BlackListEntityDao.Properties.Time.le(DateUtil.getCurrentDate())).build();
+        BlackListEntity blackEntity = build.unique();
+        return blackEntity != null;
     }
 
 }

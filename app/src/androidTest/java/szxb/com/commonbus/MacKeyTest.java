@@ -33,7 +33,7 @@ public class MacKeyTest {
     public void fetMacKey() throws Exception {
 
 //        String url = Config.getMac_key_url;
-        String url = "http://139.199.158.253/bipbus/interaction/getmackey";
+        String url = "http://120.24.212.72:8080/bipbus/interaction/getmackey";
 
         JsonRequest request = new JsonRequest(url);
         request.setRetryCount(3);

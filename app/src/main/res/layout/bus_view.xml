@@ -26,6 +26,7 @@
             android:textSize="30sp" />
 
         <LinearLayout
+            android:id="@+id/layout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="2"
@@ -68,11 +69,11 @@
                     android:layout_height="match_parent"
                     android:background="@drawable/shape_text"
                     android:gravity="center"
-                    android:transitionName="bus_line_name"
                     android:text="西部公交835"
                     android:textColor="#000000"
                     android:textSize="30sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:transitionName="bus_line_name" />
 
                 <TextView
                     android:id="@+id/prices"
