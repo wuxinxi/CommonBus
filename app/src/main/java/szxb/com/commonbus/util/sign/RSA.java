@@ -103,7 +103,7 @@ public class RSA {
     }
 
 
-    //解密
+    //mac解密
     static byte[] decryptData(byte[] encryptedData, byte[]pri_key)
     {
         try

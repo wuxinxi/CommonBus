@@ -3,6 +3,7 @@ package szxb.com.commonbus;
 import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.szxb.xblog.AndroidLogAdapter;
 import com.szxb.xblog.CsvFormatStrategy;
@@ -16,7 +17,6 @@ import com.yanzhenjie.nohttp.NoHttp;
 import com.yanzhenjie.nohttp.OkHttpNetworkExecutor;
 
 import szxb.com.commonbus.db.manager.DBCore;
-import szxb.com.commonbus.manager.MyActivityLifecycleCallbacks;
 import szxb.com.commonbus.util.crash.Cockroach;
 import szxb.com.commonbus.util.sound.SoundPoolUtil;
 import szxb.com.commonbus.util.tip.BusToast;
@@ -43,7 +43,6 @@ public class App extends Application {
                 .networkExecutor(new OkHttpNetworkExecutor())
                 .build());
         Logger.setDebug(true);
-        this.registerActivityLifecycleCallbacks(new MyActivityLifecycleCallbacks());
         SoundPoolUtil.init(this);
 
         Cockroach.install(new Cockroach.ExceptionHandler() {
@@ -53,7 +52,9 @@ public class App extends Application {
                     @Override
                     public void run() {
                         try {
-                            SoundPoolUtil.play(6);
+
+                            Log.d("App",
+                                "run(App.java:56)"+throwable.toString());
                             BusToast.showToast(App.this, "异常错误", true);
                         } catch (Throwable e) {
 

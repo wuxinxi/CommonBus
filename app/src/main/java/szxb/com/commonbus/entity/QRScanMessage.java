@@ -4,7 +4,7 @@ package szxb.com.commonbus.entity;
  * 作者: Tangren on 2017-09-11
  * 包名：szxb.com.commonbus.entity
  * 邮箱：996489865@qq.com
- * TODO:一句话描述
+ * TODO:扫码信息
  */
 
 public class QRScanMessage {

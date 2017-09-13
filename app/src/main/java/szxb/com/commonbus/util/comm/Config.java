@@ -96,7 +96,8 @@ public class Config {
     public static final String DES_KEY = "JPEf*7fU*Cal8Zag";
 
 
-    private static final String IP = "http://139.199.158.253";
+//    private static final String IP = "http://120.24.212.72:8080";//139.199.158.253
+    private static final String IP = "http://139.199.158.253";//139.199.158.253
 
     //小兵mac
     public static final String MAC_KEY = IP + "/bipbus/interaction/getmackey";
@@ -110,6 +111,7 @@ public class Config {
     //安装上报
     public static final String POS_INSTALL = IP + "/bipbus/interaction/posinstall";
 
+    public static final String XBPAY="http://120.24.212.72:8080/bipbus/interaction/posrecv";
 
     public static final String AL_APPID="24608754-1";
 

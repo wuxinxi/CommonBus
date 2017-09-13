@@ -15,7 +15,7 @@ import szxb.com.commonbus.R;
 
 public class SoundPoolUtil {
 
-    public static SoundPool mSoundPlayer = new SoundPool(10,
+    public static SoundPool mSoundPlayer = new SoundPool(30,
             AudioManager.STREAM_MUSIC, 5);
     public static SoundPoolUtil soundPlayUtils;
 
@@ -57,6 +57,7 @@ public class SoundPoolUtil {
         mSoundPlayer.load(mContext, R.raw.ec_scan_record_ecrypt_err, 1);// 23,扫码记录加密失败
         mSoundPlayer.load(mContext, R.raw.ec_scan_record_ecode_err, 1);// 24,扫码记录编码失败
         mSoundPlayer.load(mContext, R.raw.ec_fail, 1);// 25,系统错误
+        mSoundPlayer.load(mContext, R.raw.ec_re_qr_code, 1);// 26,重复刷码，请刷新二维码
         return soundPlayUtils;
     }
 

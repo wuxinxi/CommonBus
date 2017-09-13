@@ -8,7 +8,7 @@ import org.greenrobot.greendao.annotation.Generated;
  * 作者: Tangren on 2017/9/1
  * 包名：szxb.com.commonbus.entity
  * 邮箱：996489865@qq.com
- * TODO:一句话描述
+ * TODO:mac密钥表
  */
 @Entity
 public class MacKeyEntity {
@@ -60,5 +60,15 @@ public class MacKeyEntity {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    @Override
+    public String toString() {
+        return "MacKeyEntity{" +
+                "id=" + id +
+                ", key_id='" + key_id + '\'' +
+                ", pubkey='" + pubkey + '\'' +
+                ", time='" + time + '\'' +
+                '}';
     }
 }

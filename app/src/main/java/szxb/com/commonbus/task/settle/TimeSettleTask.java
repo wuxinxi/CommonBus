@@ -63,7 +63,7 @@ public class TimeSettleTask extends Service {
                                 "run(TaskRotationService.java:63)" + "swipeList.size()=" + swipeList.size());
                         return;
                     }
-                    request = new JsonRequest(Config.URL, RequestMethod.POST);
+                    request = new JsonRequest(Config.XBPAY, RequestMethod.POST);
                     JSONObject order_list = new JSONObject();
                     final JSONArray array = new JSONArray();
 
@@ -90,7 +90,7 @@ public class TimeSettleTask extends Service {
                                 ScanInfoEntityDao dao = DBCore.getDaoSession().getScanInfoEntityDao();
                                 String retmsg = response.get().getString("retmsg");
                                 if (retmsg.equals("ok")) {
-                                    JSONArray result_list = response.get().getJSONArray("retdata");
+                                    JSONArray result_list = response.get().getJSONArray("result_list");
                                     for (int i = 0; i < result_list.size(); i++) {
                                         JSONObject resultObject = result_list.getJSONObject(i);
                                         if (resultObject.getString("status").equals("00") || resultObject.getString("status").equals("91")) {
@@ -114,6 +114,8 @@ public class TimeSettleTask extends Service {
                     });
 
                 } catch (Exception e) {
+                    Log.d("TimeSettleTask",
+                        "run(TimeSettleTask.java:118)"+e.toString());
                     e.printStackTrace();
                 }
             }

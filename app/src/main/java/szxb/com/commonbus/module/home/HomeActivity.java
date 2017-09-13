@@ -2,7 +2,6 @@ package szxb.com.commonbus.module.home;
 
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
@@ -96,7 +95,6 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> {
 
         registerReceiver(mReceiver, new IntentFilter("com.szxb.bus.notice"));
 
-
         layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,18 +106,18 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> {
     }
 
     //实时扣款
+    //可直接复制到项目中
     private void receiverNews() {
         sub = RxBus.getInstance().toObservable(QRScanMessage.class)
                 .filter(new Func1<QRScanMessage, Boolean>() {
                     @Override
                     public Boolean call(QRScanMessage qrScanMessage) {
                         Log.d("HomeActivity",
-                                "call(HomeActivity.java:114)是否是主线程" + isMainThread());
-                        Log.d("HomeActivity",
                                 "call(HomeActivity.java:117)" + qrScanMessage.toString());
                         switch (qrScanMessage.getResult()) {
                             case QRCode.EC_SUCCESS://验码成功
                                 SoundPoolUtil.play(1);
+                                BusToast.showToast(App.getInstance(), "刷码成功", true);
                                 return true;
                             case QRCode.QR_ERROR://非腾讯或者小兵二维码
                                 SoundPoolUtil.play(4);
@@ -208,6 +206,10 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> {
                                 SoundPoolUtil.play(25);
                                 BusToast.showToast(App.getInstance(), "系统异常", false);
                                 break;
+                            case QRCode.REFRESH_QR_CODE://请刷新二维码
+                                SoundPoolUtil.play(26);
+                                BusToast.showToast(App.getInstance(), "请刷新二维码", false);
+                                break;
 
                             default:
 
@@ -223,7 +225,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> {
                     public void call(QRScanMessage qrScanMessage) {
                         if (qrScanMessage == null) return;
                         Map<String, Object> map = PosRequest.requestMap(qrScanMessage.getPosRecord());
-                        mPresenter.requestPost(Config.FETCH_DEBIT_WHAT, map, Config.URL);
+                        mPresenter.requestPost(Config.FETCH_DEBIT_WHAT, map, Config.XBPAY);
                     }
                 });
 
@@ -242,11 +244,6 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> {
         Log.d("HomeActivity",
                 "onFail(HomeActivity.java:243)准实时扣款失败");
     }
-
-    boolean isMainThread() {
-        return Looper.getMainLooper() == Looper.myLooper();
-    }
-
 
     @Override
     protected void onPause() {

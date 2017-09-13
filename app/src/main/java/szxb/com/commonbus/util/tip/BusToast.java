@@ -87,6 +87,7 @@ public class BusToast extends Toast {
                     if (text.equals(temStr)) {
                         if (secondTime - firstTime > Toast.LENGTH_SHORT) {
                             mToast.show();
+
                         }
                     } else {
                         temStr = (String) text;

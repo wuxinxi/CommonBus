@@ -26,7 +26,7 @@ import szxb.com.commonbus.util.tip.BusToast;
  * 作者: Tangren on 2017/8/29
  * 包名：szxb.com.commonbus.module.report
  * 邮箱：996489865@qq.com
- * TODO:机具接收到
+ * TODO:机具上报
  */
 
 public class ReportParams {

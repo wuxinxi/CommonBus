@@ -18,10 +18,11 @@ import static szxb.com.commonbus.util.comm.ParamsUtil.commonMap;
  * 作者: Tangren on 2017-09-11
  * 包名：szxb.com.commonbus.module.home
  * 邮箱：996489865@qq.com
- * TODO:一笔订单组包
+ * TODO:组包
  */
-
 public class PosRequest {
+
+    //扣款
     public static Map<String, Object> requestMap(PosRecord record) {
         JSONObject object = new JSONObject();
         object.put("open_id", record.getOpen_id());
@@ -46,7 +47,7 @@ public class PosRequest {
         JSONArray cord = new JSONArray();
         cord.add(record.getRecord());
         object.put("record", cord);
-        DBManager.insert(object,record.getMch_trx_id());//存储乘车记录
+        DBManager.insert(object, record.getMch_trx_id());//存储乘车记录
 
 
         JSONObject jsonObject = new JSONObject();
@@ -61,4 +62,39 @@ public class PosRequest {
         map.put("biz_data", jsonObject.toString());
         return map;
     }
+
+    /**
+     * 公钥/MAC下载
+     *
+     * @return map
+     */
+    public static Map<String, Object> getkeyMap() {
+        String timestamp = DateUtil.getCurrentDate();
+        String app_id = FetchAppConfig.appId();
+        Map<String, Object> map = commonMap(app_id, timestamp);
+        map.put("sign", ParamSingUtil.getSign(app_id, timestamp, null, Config.private_key));
+        map.put("biz_data", "");
+        return map;
+    }
+
+
+    /**
+     * @return 黑名单下载列表map
+     */
+    public static Map<String, Object> getBlackListMap() {
+        String timestamp = DateUtil.getCurrentDate();
+        String app_id = FetchAppConfig.appId();
+        Map<String, Object> map = commonMap(app_id, timestamp);
+        JSONObject object = new JSONObject();
+        object.put("page_index", 1);
+        object.put("page_size", 100);
+
+        object.put("begin_time", DateUtil.getLastDate("yyyy-MM-dd HH:mm:ss"));
+        object.put("end_time", DateUtil.getCurrentDate());
+
+        map.put("sign", ParamSingUtil.getSign(app_id, timestamp, object, Config.private_key));
+        map.put("biz_data", object.toString());
+        return map;
+    }
+
 }

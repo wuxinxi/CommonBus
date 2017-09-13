@@ -106,4 +106,7 @@ public class QRCode {
     //软件异常
     public static final int SOFTWARE_EXCEPTION = 9;
 
+    //重复刷码，请求刷新二维码
+    public static final int REFRESH_QR_CODE = 10;
+
 }

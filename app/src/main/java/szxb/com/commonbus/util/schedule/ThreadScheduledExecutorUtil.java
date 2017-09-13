@@ -7,7 +7,7 @@ import java.util.concurrent.ScheduledExecutorService;
  * 作者: Tangren on 2017/8/15
  * 包名：com.szxb.buspay.task
  * 邮箱：996489865@qq.com
- * TODO:单利任务调度线程池
+ * TODO:单例任务调度线程池
  */
 
 public class ThreadScheduledExecutorUtil {

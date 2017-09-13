@@ -39,8 +39,6 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
-    compile files('libs/wlxsdkcore.jar')
     compile project(':xblog')
     compile rootProject.ext.dependencies["appcompat-v7"]
     testCompile rootProject.ext.dependencies["junit"]
@@ -51,5 +49,6 @@ dependencies {
     compile rootProject.ext.dependencies["materialloadingprogressbar"]
     compile rootProject.ext.dependencies["nohttp:okhttp"]
     compile rootProject.ext.dependencies["fastjson"]
-//    compile rootProject.ext.dependencies["aliyun"]
+    //    compile rootProject.ext.dependencies["aliyun"]
+    compile files('src/libs/wlxsdkcore.jar')
 }

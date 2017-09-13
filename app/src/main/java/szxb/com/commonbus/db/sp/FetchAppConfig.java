@@ -12,7 +12,7 @@ public class FetchAppConfig {
 
     //获取appId
     public static String appId() {
-        return (String) CommonSharedPreferences.get("appId", "10000002");
+        return (String) CommonSharedPreferences.get("appId", "20000007");
     }
 
     //获取起始站

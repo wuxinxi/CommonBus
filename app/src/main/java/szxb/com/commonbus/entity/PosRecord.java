@@ -4,7 +4,7 @@ package szxb.com.commonbus.entity;
  * 作者: Tangren on 2017-09-08
  * 包名：szxb.com.commonbus.entity
  * 邮箱：996489865@qq.com
- * TODO:一句话描述
+ * TODO:刷码信息
  */
 
 public class PosRecord {

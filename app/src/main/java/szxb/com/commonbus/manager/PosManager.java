@@ -1,6 +1,7 @@
 package szxb.com.commonbus.manager;
 
 import android.util.Base64;
+import android.util.Log;
 
 import com.example.zhoukai.modemtooltest.ModemToolTest;
 
@@ -16,7 +17,6 @@ import szxb.com.commonbus.interfaces.IPosManage;
 import szxb.com.commonbus.util.comm.Config;
 import szxb.com.commonbus.util.comm.DateUtil;
 import szxb.com.commonbus.util.comm.Utils;
-import szxb.com.commonbus.util.sign.RSA;
 
 /**
  * 作者: Tangren on 2017-09-08
@@ -27,20 +27,30 @@ import szxb.com.commonbus.util.sign.RSA;
 
 public class PosManager implements IPosManage {
 
+    //路线名
     private String lineName;
+    //起始站名
     private String startStationName;
+    //终点站名
     private String endStationName;
+    //设备号
     private String driverNo;
+    //价格
     private int markedPrice;
+    //mac列表
     private List<MacKeyEntity> macKeyEntityList;
+    //公钥列表
     private List<PublicKeyEntity> publicKeyEntityList;
-    private String cityCode = "440300";
+    //城市编码
+    private String cityCode = "440100";
+    //站点ID
     private int inStationId = 13;
+    //站点名
     private String inStationName;
+    //备注
     private String orderDesc;
+    //key
     private byte[] key;
-    private String busNo;
-    private String busLineName;
 
     public PosManager() {
 
@@ -56,7 +66,6 @@ public class PosManager implements IPosManage {
         macKeyEntityList = DBManager.getMacList();
         publicKeyEntityList = DBManager.getPublicKeylist();
         inStationName = FetchAppConfig.startStationName();
-        busNo = FetchAppConfig.busNo();
         orderDesc = FetchAppConfig.orderDesc();
         key = Base64.decode(Config.private_key, Base64.NO_WRAP);
     }
@@ -124,7 +133,9 @@ public class PosManager implements IPosManage {
     @Override
     public String getMac(String keyId) {
         String mac = DBManager.getMac(keyId);
-        return RSA.RSADecrypt(mac, getKey());
+        Log.d("PosManager",
+                "getMac(PosManager.java:128)" + mac);
+        return mac;
     }
 
     @Override
@@ -203,17 +214,6 @@ public class PosManager implements IPosManage {
     public void setKey(String privateKey) {
         byte[] key = Base64.decode(privateKey, Base64.NO_WRAP);
         this.key = key;
-    }
-
-    @Override
-    public String getBusNo() {
-        return busNo;
-    }
-
-    @Override
-    public void setBusNo(String busNo) {
-        this.busNo = busNo;
-        CommonSharedPreferences.put("busNo", busNo);
     }
 
     @Override
