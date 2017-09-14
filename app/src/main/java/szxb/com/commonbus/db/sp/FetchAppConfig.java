@@ -45,16 +45,6 @@ public class FetchAppConfig {
         return (Integer) CommonSharedPreferences.get("chargeType", 0);
     }
 
-    //获取公钥1
-    public static String key_1() {
-        return (String) CommonSharedPreferences.get("key_0", "02C5F34D7F24886F657E7FE728D795D75A2632F2B79091B517BD79787E");
-    }
-
-    //获取公钥2
-    public static String key_2() {
-        return (String) CommonSharedPreferences.get("key_1", "03AE275B0BB13A9F189A2B0A93CD25A70B69737717428AEA35EC3A026F");
-    }
-
     //获取保存公钥时间
     public static String saveKeyTime() {
         return (String) CommonSharedPreferences.get("save_key_time", "2017-08-31");

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
 
+import java.util.Calendar;
+
 import szxb.com.commonbus.R;
 
 /**
@@ -66,8 +68,20 @@ public class SoundPoolUtil {
      *
      * @param soundID
      */
+    private static final int MIN_PLAY_DELAY_TIME = 2000;
+    private static long lastClickTime = 0;
+    private static int temSoundID;
+
+
     public static void play(int soundID) {
-        mSoundPlayer.play(soundID, 1, 1, 0, 0, 1);
+        long currentTime = Calendar.getInstance().getTimeInMillis();
+        if (soundID == temSoundID) {
+            if (currentTime - lastClickTime > MIN_PLAY_DELAY_TIME) {
+                lastClickTime = currentTime;
+                mSoundPlayer.play(soundID, 1, 1, 0, 0, 1);
+            }
+        } else mSoundPlayer.play(soundID, 1, 1, 0, 0, 1);
+        temSoundID = soundID;
     }
 
     public static void release() {

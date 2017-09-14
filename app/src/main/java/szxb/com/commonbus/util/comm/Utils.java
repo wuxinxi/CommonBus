@@ -221,7 +221,6 @@ public class Utils {
     }
 
 
-
     public static String bytesToHexString(byte[] src, int len) {
         StringBuilder stringBuilder = new StringBuilder("");
         if (src == null || len <= 0) {
@@ -246,5 +245,42 @@ public class Utils {
 
     public static String getResult2String(byte[] resultByte) {
         return hex2IntString(bytesToHexString(resultByte, resultByte.length));
+    }
+
+
+    public static String mode(int mode) {
+        switch (mode) {
+            case 0:
+                return "正常请求模式";
+            case 1:
+                return "扫码模式";
+            case 2:
+                return ":本地补丁模式";
+            default:
+                return "未知模式";
+        }
+    }
+
+    public static String code(int code) {
+        switch (code) {
+            case 1:
+                return "补丁加载成功";
+            case 6:
+                return "服务端没有最新可用的补丁";
+            case 11:
+                return ":RSASECRET错误，官网中的密钥是否正确请检查";
+            case 12:
+                return ":当前应用已经存在一个旧补丁, 应用重启尝试加载新补丁";
+            case 13:
+                return ":补丁加载失败, 导致的原因很多种, 比如UnsatisfiedLinkError等异常, 此时应该严格检查logcat异常日志";
+            case 16:
+                return ":APPSECRET错误，官网中的密钥是否正确请检查";
+            case 18:
+                return ":一键清除补丁";
+            case 19:
+                return ":连续两次queryAndLoadNewPatch()方法调用不能短于3s";
+            default:
+                return "未知错误";
+        }
     }
 }

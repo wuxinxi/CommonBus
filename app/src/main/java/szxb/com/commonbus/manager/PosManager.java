@@ -1,18 +1,13 @@
 package szxb.com.commonbus.manager;
 
 import android.util.Base64;
-import android.util.Log;
 
 import com.example.zhoukai.modemtooltest.ModemToolTest;
-
-import java.util.List;
 
 import szxb.com.commonbus.db.manager.DBManager;
 import szxb.com.commonbus.db.sp.CommonSharedPreferences;
 import szxb.com.commonbus.db.sp.FetchAppConfig;
-import szxb.com.commonbus.entity.MacKeyEntity;
 import szxb.com.commonbus.entity.PosRecord;
-import szxb.com.commonbus.entity.PublicKeyEntity;
 import szxb.com.commonbus.interfaces.IPosManage;
 import szxb.com.commonbus.util.comm.Config;
 import szxb.com.commonbus.util.comm.DateUtil;
@@ -26,7 +21,6 @@ import szxb.com.commonbus.util.comm.Utils;
  */
 
 public class PosManager implements IPosManage {
-
     //路线名
     private String lineName;
     //起始站名
@@ -37,20 +31,18 @@ public class PosManager implements IPosManage {
     private String driverNo;
     //价格
     private int markedPrice;
-    //mac列表
-    private List<MacKeyEntity> macKeyEntityList;
-    //公钥列表
-    private List<PublicKeyEntity> publicKeyEntityList;
     //城市编码
     private String cityCode = "440100";
     //站点ID
     private int inStationId = 13;
-    //站点名
-    private String inStationName;
     //备注
     private String orderDesc;
     //key
     private byte[] key;
+    //车牌号
+    private String bus_no;
+
+    private String app_id;
 
     public PosManager() {
 
@@ -63,11 +55,10 @@ public class PosManager implements IPosManage {
         endStationName = FetchAppConfig.endStationName();
         driverNo = ModemToolTest.getItem(7);
         markedPrice = FetchAppConfig.ticketPrice();
-        macKeyEntityList = DBManager.getMacList();
-        publicKeyEntityList = DBManager.getPublicKeylist();
-        inStationName = FetchAppConfig.startStationName();
         orderDesc = FetchAppConfig.orderDesc();
         key = Base64.decode(Config.private_key, Base64.NO_WRAP);
+        bus_no = FetchAppConfig.busNo();
+        app_id = FetchAppConfig.appId();
     }
 
     @Override
@@ -126,38 +117,14 @@ public class PosManager implements IPosManage {
     }
 
     @Override
-    public List<MacKeyEntity> getMacList() {
-        return macKeyEntityList;
-    }
-
-    @Override
     public String getMac(String keyId) {
-        String mac = DBManager.getMac(keyId);
-        Log.d("PosManager",
-                "getMac(PosManager.java:128)" + mac);
-        return mac;
-    }
-
-    @Override
-    public void setMacList(List<MacKeyEntity> list) {
-        this.macKeyEntityList = list;
-    }
-
-    @Override
-    public List<PublicKeyEntity> getPublicKeyList() {
-        return publicKeyEntityList;
+        return DBManager.getMac(keyId);
     }
 
     @Override
     public String getPublicKey(String keyId) {
         return DBManager.getPublicKey(keyId);
     }
-
-    @Override
-    public void setPublicKeyList(List<PublicKeyEntity> list) {
-        this.publicKeyEntityList = list;
-    }
-
 
     @Override
     public long getOrderTime() {
@@ -214,6 +181,28 @@ public class PosManager implements IPosManage {
     public void setKey(String privateKey) {
         byte[] key = Base64.decode(privateKey, Base64.NO_WRAP);
         this.key = key;
+    }
+
+    @Override
+    public String getBusNo() {
+        return bus_no;
+    }
+
+    @Override
+    public void setBusNo(String bus_no) {
+        this.bus_no = bus_no;
+        CommonSharedPreferences.put("busNo", bus_no);
+    }
+
+    @Override
+    public String getAppId() {
+        return app_id;
+    }
+
+    @Override
+    public void setAppId(String app_id) {
+        this.app_id = app_id;
+        CommonSharedPreferences.put("appId", app_id);
     }
 
     @Override

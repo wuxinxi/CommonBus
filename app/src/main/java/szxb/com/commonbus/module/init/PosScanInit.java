@@ -112,7 +112,7 @@ public class PosScanInit {
         Observable<Boolean> blackList = Observable.create(new Observable.OnSubscribe<Boolean>() {
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
-                JsonRequest blackListRequest = new JsonRequest(Config.BLACK_QUERY);
+                JsonRequest blackListRequest = new JsonRequest(Config.BLACK_LIST);
                 blackListRequest.set(PosRequest.getBlackListMap());
                 Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(blackListRequest);
                 if (execute.isSucceed()) {

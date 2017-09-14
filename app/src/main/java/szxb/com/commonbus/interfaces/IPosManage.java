@@ -1,10 +1,6 @@
 package szxb.com.commonbus.interfaces;
 
-import java.util.List;
-
-import szxb.com.commonbus.entity.MacKeyEntity;
 import szxb.com.commonbus.entity.PosRecord;
-import szxb.com.commonbus.entity.PublicKeyEntity;
 
 /**
  * 作者: Tangren on 2017-09-08
@@ -37,17 +33,10 @@ public interface IPosManage {
 
     void setMarkedPrice(int var1);
 
-    List<MacKeyEntity> getMacList();
-
     String getMac(String keyId);
-
-    void setMacList(List<MacKeyEntity> list);
-
-    List<PublicKeyEntity> getPublicKeyList();
 
     String getPublicKey(String keyId);
 
-    void setPublicKeyList(List<PublicKeyEntity> list);
 
     long getOrderTime();
 
@@ -70,6 +59,14 @@ public interface IPosManage {
     byte[] getKey();
 
     void setKey(String privateKey);
+
+    String getBusNo();
+
+    void setBusNo(String bus_no);
+
+    String getAppId();
+
+    void setAppId(String app_id);
 
 
     void dowithPosRecordReply(PosRecord var1, int var2);

@@ -52,10 +52,17 @@ public class LoopScanTask extends Service {
                     int barcode = libszxb.getBarcode(recv);
                     if (barcode > 0) {
                         String result = new String(recv, 0, barcode);
-                        if (TextUtils.equals(result, tem)) return;
                         if (PosScanManager.isMyQRcode(result)) {
+                            if (TextUtils.equals(result, tem)) {
+                                RxBus.getInstance().send(new QRScanMessage(null, QRCode.REFRESH_QR_CODE));
+                                return;
+                            }
                             PosScanManager.getInstance().xbposScan(result);
                         } else if (PosScanManager.isTenQRcode(result)) {
+                            if (TextUtils.equals(result, tem)) {
+                                RxBus.getInstance().send(new QRScanMessage(null, QRCode.REFRESH_QR_CODE));
+                                return;
+                            }
                             PosScanManager.getInstance().txposScan(result);
                         } else {
                             RxBus.getInstance().send(new QRScanMessage(null, QRCode.QR_ERROR));
@@ -74,5 +81,6 @@ public class LoopScanTask extends Service {
     public static IPosManage getPosManager() {
         return manager;
     }
+
 
 }

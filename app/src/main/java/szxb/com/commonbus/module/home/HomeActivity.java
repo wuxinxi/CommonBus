@@ -235,14 +235,14 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> {
     public void onSuccess(int what, String str) {
         super.onSuccess(what, str);
         Log.d("HomeActivity",
-                "onSuccess(HomeActivity.java:236)准实时扣款成功");
+                "onSuccess(HomeActivity.java:236)准实时扣款成功"+str);
     }
 
     @Override
     public void onFail(int what, String str) {
         super.onFail(what, str);
         Log.d("HomeActivity",
-                "onFail(HomeActivity.java:243)准实时扣款失败");
+                "onFail(HomeActivity.java:243)准实时扣款失败"+str);
     }
 
     @Override

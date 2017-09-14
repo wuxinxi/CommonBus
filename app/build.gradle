@@ -13,9 +13,9 @@ android {
         versionName rootProject.ext.android.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-//        ndk {
-//            abiFilters 'armeabi'
-//        }
+        ndk {
+            abiFilters 'armeabi'
+        }
     }
 
 
@@ -49,6 +49,5 @@ dependencies {
     compile rootProject.ext.dependencies["materialloadingprogressbar"]
     compile rootProject.ext.dependencies["nohttp:okhttp"]
     compile rootProject.ext.dependencies["fastjson"]
-    //    compile rootProject.ext.dependencies["aliyun"]
-    compile files('src/libs/wlxsdkcore.jar')
+    compile rootProject.ext.dependencies["aliyun"]
 }
