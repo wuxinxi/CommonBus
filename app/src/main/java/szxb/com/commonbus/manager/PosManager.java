@@ -17,7 +17,7 @@ import szxb.com.commonbus.util.comm.Utils;
  * 作者: Tangren on 2017-09-08
  * 包名：szxb.com.commonbus.manager
  * 邮箱：996489865@qq.com
- * TODO:一句话描述
+ * TODO:POS数据初始化
  */
 
 public class PosManager implements IPosManage {

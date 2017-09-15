@@ -12,8 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import szxb.com.commonbus.entity.QRCode;
 import szxb.com.commonbus.entity.QRScanMessage;
-import szxb.com.commonbus.interfaces.IPosManage;
-import szxb.com.commonbus.manager.PosManager;
 import szxb.com.commonbus.manager.report.PosScanManager;
 import szxb.com.commonbus.util.rx.RxBus;
 import szxb.com.commonbus.util.schedule.ThreadScheduledExecutorUtil;
@@ -34,15 +32,10 @@ public class LoopScanTask extends Service {
 
     //临时变量存储上次刷卡记录,为了防止重复刷卡
     private String tem = "0";
-    private static PosManager manager;
 
     @Override
     public void onCreate() {
         super.onCreate();
-
-        manager = new PosManager();
-        manager.loadFromPrefs();
-
         ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -77,10 +70,5 @@ public class LoopScanTask extends Service {
             }
         }, 500, 200, TimeUnit.MILLISECONDS);
     }
-
-    public static IPosManage getPosManager() {
-        return manager;
-    }
-
 
 }

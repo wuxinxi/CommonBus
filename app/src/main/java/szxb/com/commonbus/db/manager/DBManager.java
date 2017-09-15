@@ -1,5 +1,6 @@
 package szxb.com.commonbus.db.manager;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.greenrobot.greendao.query.Query;
@@ -100,7 +101,7 @@ public class DBManager {
     public static boolean filterBlackName(String openID) {
         BlackListEntityDao dao = DBCore.getDaoSession().getBlackListEntityDao();
         Query<BlackListEntity> build = dao.queryBuilder().where(BlackListEntityDao.Properties.Open_id.eq(openID),
-                BlackListEntityDao.Properties.Time.le(DateUtil.getCurrentDate())).build();
+                BlackListEntityDao.Properties.Time.le(DateUtil.currentLong())).build();
         BlackListEntity blackEntity = build.unique();
         return blackEntity != null;
     }
@@ -116,15 +117,44 @@ public class DBManager {
         infoEntity.setStatus(false);
         infoEntity.setBiz_data_single(object.toJSONString());
         infoEntity.setMch_trx_id(mch_trx_id);
+        infoEntity.setTime(DateUtil.getCurrentDate());
         DBCore.getDaoSession().getScanInfoEntityDao().insert(infoEntity);
     }
 
     /**
-     * @return 得到未支付的数据每次最多25条
+     * @return 得到未支付的数据每次最多25条, 降序排列取得最新的最多25条数据
      */
     public static List<ScanInfoEntity> getSwipeList() {
         ScanInfoEntityDao dao = DBCore.getDaoSession().getScanInfoEntityDao();
-        Query<ScanInfoEntity> qb = dao.queryBuilder().where(ScanInfoEntityDao.Properties.Status.eq(false)).limit(25).build();
+        Query<ScanInfoEntity> qb = dao.queryBuilder().where(ScanInfoEntityDao.Properties.Status.eq(false))
+                .limit(25).orderDesc(ScanInfoEntityDao.Properties.Id).build();
         return qb.list();
+    }
+
+
+    /**
+     * 删除过期的黑名单
+     */
+    private static void deleteOverDueBlackName() {
+        BlackListEntityDao dao = DBCore.getDaoSession().getBlackListEntityDao();
+        List<BlackListEntity> list = dao.queryBuilder().where(BlackListEntityDao.Properties.Time
+                .le(DateUtil.currentLong())).build().list();
+        dao.deleteInTx(list);
+    }
+
+    /**
+     * 更新黑名单
+     *
+     * @param memberList
+     */
+    public static void addBlackList(JSONArray memberList) {
+        deleteOverDueBlackName();
+        for (int i = 0; i < memberList.size(); i++) {
+            JSONObject object = memberList.getJSONObject(i);
+            BlackListEntity entity = new BlackListEntity();
+            entity.setOpen_id(object.getString("open_id"));
+            entity.setTime(object.getLong("time"));
+            DBCore.getDaoSession().insert(entity);
+        }
     }
 }

@@ -1,10 +1,10 @@
-package szxb.com.commonbus.module.home;
+package szxb.com.commonbus.interfaces;
 
 /**
  * 作者: Tangren on 2017-09-12
  * 包名：szxb.com.commonbus.module.home
  * 邮箱：996489865@qq.com
- * TODO:
+ * TODO:初始化回调
  */
 
 public interface InitOnListener {

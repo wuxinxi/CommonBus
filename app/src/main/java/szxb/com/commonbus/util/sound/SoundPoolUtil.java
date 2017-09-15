@@ -12,7 +12,7 @@ import szxb.com.commonbus.R;
  * 作者: Tangren on 2017-09-05
  * 包名：szxb.com.commonbus.util.sound
  * 邮箱：996489865@qq.com
- * TODO:一句话描述
+ * TODO:音源管理
  */
 
 public class SoundPoolUtil {
@@ -71,7 +71,6 @@ public class SoundPoolUtil {
     private static final int MIN_PLAY_DELAY_TIME = 2000;
     private static long lastClickTime = 0;
     private static int temSoundID;
-
 
     public static void play(int soundID) {
         long currentTime = Calendar.getInstance().getTimeInMillis();

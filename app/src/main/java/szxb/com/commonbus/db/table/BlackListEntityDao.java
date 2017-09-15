@@ -26,7 +26,7 @@ public class BlackListEntityDao extends AbstractDao<BlackListEntity, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Open_id = new Property(1, String.class, "open_id", false, "OPEN_ID");
-        public final static Property Time = new Property(2, String.class, "time", false, "TIME");
+        public final static Property Time = new Property(2, long.class, "time", false, "TIME");
     }
 
 
@@ -44,7 +44,7 @@ public class BlackListEntityDao extends AbstractDao<BlackListEntity, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"BLACK_LIST_ENTITY\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"OPEN_ID\" TEXT," + // 1: open_id
-                "\"TIME\" TEXT);"); // 2: time
+                "\"TIME\" INTEGER NOT NULL );"); // 2: time
     }
 
     /** Drops the underlying database table. */
@@ -66,11 +66,7 @@ public class BlackListEntityDao extends AbstractDao<BlackListEntity, Long> {
         if (open_id != null) {
             stmt.bindString(2, open_id);
         }
- 
-        String time = entity.getTime();
-        if (time != null) {
-            stmt.bindString(3, time);
-        }
+        stmt.bindLong(3, entity.getTime());
     }
 
     @Override
@@ -86,11 +82,7 @@ public class BlackListEntityDao extends AbstractDao<BlackListEntity, Long> {
         if (open_id != null) {
             stmt.bindString(2, open_id);
         }
- 
-        String time = entity.getTime();
-        if (time != null) {
-            stmt.bindString(3, time);
-        }
+        stmt.bindLong(3, entity.getTime());
     }
 
     @Override
@@ -103,7 +95,7 @@ public class BlackListEntityDao extends AbstractDao<BlackListEntity, Long> {
         BlackListEntity entity = new BlackListEntity( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // open_id
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // time
+            cursor.getLong(offset + 2) // time
         );
         return entity;
     }
@@ -112,7 +104,7 @@ public class BlackListEntityDao extends AbstractDao<BlackListEntity, Long> {
     public void readEntity(Cursor cursor, BlackListEntity entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setOpen_id(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setTime(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setTime(cursor.getLong(offset + 2));
      }
     
     @Override

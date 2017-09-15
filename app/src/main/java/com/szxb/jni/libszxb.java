@@ -49,17 +49,6 @@ public class libszxb {
 		}
 	}
 	
-	
-	static {
-		try {
-			System.loadLibrary("halcrypto");
-		} catch (Throwable e) {
-			Log.e("jni", "i can't find halcrypto so!");
-			e.printStackTrace();
-		}
-	}
-	
-	
 	//公交车接口
 	
 	public native static void deviceReset();

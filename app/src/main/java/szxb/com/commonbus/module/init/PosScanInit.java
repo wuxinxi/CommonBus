@@ -21,15 +21,15 @@ import rx.functions.Action1;
 import rx.functions.Func3;
 import rx.schedulers.Schedulers;
 import szxb.com.commonbus.db.manager.DBCore;
+import szxb.com.commonbus.db.manager.DBManager;
 import szxb.com.commonbus.db.sp.CommonSharedPreferences;
-import szxb.com.commonbus.entity.BlackListEntity;
 import szxb.com.commonbus.entity.MacKeyEntity;
 import szxb.com.commonbus.entity.PublicKeyEntity;
 import szxb.com.commonbus.http.JsonRequest;
-import szxb.com.commonbus.module.home.InitOnListener;
-import szxb.com.commonbus.module.home.PosRequest;
+import szxb.com.commonbus.interfaces.InitOnListener;
 import szxb.com.commonbus.util.comm.Config;
 import szxb.com.commonbus.util.comm.DateUtil;
+import szxb.com.commonbus.util.comm.ParamsUtil;
 import szxb.com.commonbus.util.tip.BusToast;
 
 /**
@@ -51,7 +51,7 @@ public class PosScanInit {
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
                 JsonRequest macRequest = new JsonRequest(Config.MAC_KEY);
-                macRequest.set(PosRequest.getkeyMap());
+                macRequest.set(ParamsUtil.getkeyMap());
                 Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(macRequest);
                 if (execute.isSucceed()) {
                     Log.d("InitZipActivity",
@@ -87,7 +87,7 @@ public class PosScanInit {
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
                 JsonRequest publicKeyRequest = new JsonRequest(Config.PUBLIC_KEY);
-                publicKeyRequest.set(PosRequest.getkeyMap());
+                publicKeyRequest.set(ParamsUtil.getkeyMap());
                 Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(publicKeyRequest);
                 if (execute.isSucceed()) {
                     Log.d("InitZipActivity",
@@ -113,7 +113,7 @@ public class PosScanInit {
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
                 JsonRequest blackListRequest = new JsonRequest(Config.BLACK_LIST);
-                blackListRequest.set(PosRequest.getBlackListMap());
+                blackListRequest.set(ParamsUtil.getBlackListMap());
                 Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(blackListRequest);
                 if (execute.isSucceed()) {
                     Log.d("InitZipActivity",
@@ -125,21 +125,7 @@ public class PosScanInit {
                             subscriber.onNext(true);
                             return;
                         }
-                        //删除所有
-                        AsyncSession async = DBCore.getASyncDaoSession();
-                        async.setListener(new AsyncOperationListener() {
-                            @Override
-                            public void onAsyncOperationCompleted(AsyncOperation operation) {
-                                for (int i = 0; i < array.size(); i++) {
-                                    JSONObject object = array.getJSONObject(i);
-                                    BlackListEntity entity = new BlackListEntity();
-                                    entity.setOpen_id(object.getString("open_id"));
-                                    entity.setTime(DateUtil.long2String(object.getLong("time")));
-                                    DBCore.getDaoSession().insert(entity);
-                                }
-                            }
-                        });
-                        async.deleteAll(BlackListEntity.class);
+                        DBManager.addBlackList(array);
                         subscriber.onNext(true);
                     } else subscriber.onNext(false);
                 } else subscriber.onError(execute.getException());

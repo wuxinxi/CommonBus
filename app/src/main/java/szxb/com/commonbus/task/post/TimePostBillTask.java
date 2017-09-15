@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import szxb.com.commonbus.App;
 import szxb.com.commonbus.base.BaseView;
 import szxb.com.commonbus.db.manager.DBManager;
 import szxb.com.commonbus.db.sp.CommonSharedPreferences;
@@ -74,9 +75,9 @@ public class TimePostBillTask extends Service implements BaseView {
 
     private Map<String, Object> commMap() {
         Map<String, Object> map = new HashMap<>();
-        map.put("app_id", FetchAppConfig.appId());
-        map.put("sn_no", FetchAppConfig.snNo());
-        map.put("bus_no", FetchAppConfig.busNo());
+        map.put("app_id", App.getPosManager().getAppId());
+        map.put("sn_no", App.getPosManager().getDriverNo());
+        map.put("bus_no", App.getPosManager().getBusNo());
         map.put("bus_time", DateUtil.getCurrentDate());
         return map;
     }

@@ -28,6 +28,7 @@ import szxb.com.commonbus.http.JsonRequest;
 import szxb.com.commonbus.util.comm.Config;
 import szxb.com.commonbus.util.comm.DateUtil;
 import szxb.com.commonbus.util.comm.ParamsUtil;
+import szxb.com.commonbus.util.comm.Utils;
 import szxb.com.commonbus.util.schedule.ThreadScheduledExecutorUtil;
 import szxb.com.commonbus.util.sign.ParamSingUtil;
 
@@ -35,7 +36,7 @@ import szxb.com.commonbus.util.sign.ParamSingUtil;
  * 作者: Tangren on 2017/8/16
  * 包名：szxb.com.commonbus.task
  * 邮箱：996489865@qq.com
- * TODO:定时结算
+ * TODO:定时处理未按时结算的订单
  */
 
 public class TimeSettleTask extends Service {
@@ -58,7 +59,7 @@ public class TimeSettleTask extends Service {
             public void run() {
                 try {
                     final List<ScanInfoEntity> swipeList = DBManager.getSwipeList();
-                    if (swipeList == null || swipeList.size() == 0) {
+                    if (swipeList == null || swipeList.size() == 0 || !Utils.checkNetStatus()) {
                         Log.d("TaskRotationService",
                                 "run(TaskRotationService.java:63)" + "swipeList.size()=" + swipeList.size());
                         return;
@@ -115,7 +116,7 @@ public class TimeSettleTask extends Service {
 
                 } catch (Exception e) {
                     Log.d("TimeSettleTask",
-                        "run(TimeSettleTask.java:118)"+e.toString());
+                            "run(TimeSettleTask.java:118)" + e.toString());
                     e.printStackTrace();
                 }
             }

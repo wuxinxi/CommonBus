@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSONObject;
 
+import szxb.com.commonbus.App;
 import szxb.com.commonbus.db.sp.CommonSharedPreferences;
 import szxb.com.commonbus.module.report.ReportParams;
 import szxb.com.commonbus.util.comm.Config;
@@ -45,9 +46,9 @@ public class XBPosReportManager {
         if (qrcode.length() < 56) return;
         String date = qrcode.substring(7, 17);
         Log.d("XBPosReportManager",
-            "posScan(XBPosReportManager.java:48)"+date);
+                "posScan(XBPosReportManager.java:48)" + date);
         Log.d("XBPosReportManager",
-            "posScan(XBPosReportManager.java:48)"+DateUtil.times(date));
+                "posScan(XBPosReportManager.java:48)" + DateUtil.times(date));
         if (TextUtils.equals(DateUtil.times(date), DateUtil.getCurrentDate("yyyy-MM-dd"))) {
             SoundPoolUtil.play(1);
             JSONObject object = new JSONObject();
@@ -77,9 +78,17 @@ public class XBPosReportManager {
             CommonSharedPreferences.put("endStationName", end_station);
             CommonSharedPreferences.put("lineName", line_name);
 
+
+            App.getPosManager().setBusNo(bus_no);
+            App.getPosManager().setLineStart(start_station);
+            App.getPosManager().setLineEnd(end_station);
+            App.getPosManager().setLineName(line_name);
+            App.getPosManager().setMarkedPrice(Utils.string2Integer(prices));
+
+
             object.put("bus_no", params[0]);
             object.put("is_set_pos", "1");
-            object.put("pos_no", "SN001");
+            object.put("pos_no", App.getPosManager().getDriverNo());
             object.put("is_online", "1");
 
             object.put("bus_line_name", line_name);

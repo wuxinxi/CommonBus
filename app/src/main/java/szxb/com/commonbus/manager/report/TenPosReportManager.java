@@ -5,18 +5,18 @@ import android.util.Log;
 
 import com.tencent.wlxsdk.WlxSdk;
 
+import szxb.com.commonbus.App;
 import szxb.com.commonbus.db.manager.DBManager;
 import szxb.com.commonbus.entity.PosRecord;
 import szxb.com.commonbus.entity.QRCode;
 import szxb.com.commonbus.entity.QRScanMessage;
-import szxb.com.commonbus.task.scan.LoopScanTask;
 import szxb.com.commonbus.util.rx.RxBus;
 
 /**
  * 作者: Tangren on 2017-09-08
  * 包名：szxb.com.commonbus.util.report
  * 邮箱：996489865@qq.com
- * TODO:一句话描述
+ * TODO:腾讯
  */
 
 public class TenPosReportManager {
@@ -54,40 +54,32 @@ public class TenPosReportManager {
                 if (init == 0 && key_id > 0) {
                     //String open_id, String pub_key, int payfee, byte scene, byte scantype, String pos_id, String pos_trx_id, String aes_mac_root
                     verify = wxSdk.verify(open_id
-                            , LoopScanTask.getPosManager().getPublicKey(String.valueOf(key_id))
-//                            , LoopScanTask.getPosManager().getMarkedPrice()
+                            , App.getPosManager().getPublicKey(String.valueOf(key_id))
+//                            , App.getPosManager().getMarkedPrice()
                             , 1
                             , (byte) 1
                             , (byte) 1
-                            , LoopScanTask.getPosManager().getDriverNo()
-                            , LoopScanTask.getPosManager().getmchTrxId()
-                            , LoopScanTask.getPosManager().getMac(mac_root_id));
-                    Log.d("TenPosReportManager",
-                            "posScan(TenPosReportManager.java:63)verify=" + verify);
-                    Log.d("TenPosReportManager",
-                            "posScan(TenPosReportManager.java:65)getPublicKey=" + LoopScanTask.getPosManager().getPublicKey(String.valueOf(key_id)));
-                    Log.d("TenPosReportManager",
-                            "posScan(TenPosReportManager.java:67)getmchTrxId=" + LoopScanTask.getPosManager().getmchTrxId());
-                    Log.d("TenPosReportManager",
-                            "posScan(TenPosReportManager.java:69)getMac=" + LoopScanTask.getPosManager().getMac(mac_root_id));
+                            , App.getPosManager().getDriverNo()
+                            , App.getPosManager().getmchTrxId()
+                            , App.getPosManager().getMac(mac_root_id));
 
                     String record = wxSdk.get_record();
                     PosRecord posRecord = new PosRecord();
                     posRecord.setOpen_id(open_id);
-                    posRecord.setMch_trx_id(LoopScanTask.getPosManager().getmchTrxId());
-                    posRecord.setOrder_time(LoopScanTask.getPosManager().getOrderTime());
+                    posRecord.setMch_trx_id(App.getPosManager().getmchTrxId());
+                    posRecord.setOrder_time(App.getPosManager().getOrderTime());
                     posRecord.setTotal_fee(1);
-//                    posRecord.setTotal_fee(LoopScanTask.getPosManager().getMarkedPrice());
-//                    posRecord.setPay_fee(LoopScanTask.getPosManager().getMarkedPrice());
+//                    posRecord.setTotal_fee(App.getPosManager().getMarkedPrice());
+//                    posRecord.setPay_fee(App.getPosManager().getMarkedPrice());
                     posRecord.setPay_fee(1);
-                    posRecord.setCity_code(LoopScanTask.getPosManager().geCityCode());
-                    posRecord.setOrder_desc(LoopScanTask.getPosManager().getOrderDesc());
-                    posRecord.setIn_station_id(LoopScanTask.getPosManager().getInStationId());
-                    posRecord.setIn_station_name(LoopScanTask.getPosManager().getInStationName());
+                    posRecord.setCity_code(App.getPosManager().geCityCode());
+                    posRecord.setOrder_desc(App.getPosManager().getOrderDesc());
+                    posRecord.setIn_station_id(App.getPosManager().getInStationId());
+                    posRecord.setIn_station_name(App.getPosManager().getInStationName());
                     posRecord.setRecord(record);
-                    posRecord.setBus_no(LoopScanTask.getPosManager().getDriverNo());
-                    posRecord.setBus_line_name(LoopScanTask.getPosManager().getLineName());
-                    posRecord.setPos_no(LoopScanTask.getPosManager().getDriverNo());
+                    posRecord.setBus_no(App.getPosManager().getBusNo());
+                    posRecord.setBus_line_name(App.getPosManager().getLineName());
+                    posRecord.setPos_no(App.getPosManager().getDriverNo());
 
                     RxBus.getInstance().send(new QRScanMessage(posRecord, verify));
                 }

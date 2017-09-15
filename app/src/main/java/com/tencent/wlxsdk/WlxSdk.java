@@ -6,7 +6,7 @@ import android.text.TextUtils;
  * 作者: Tangren on 2017-09-13
  * 包名：com.tencent.wlxsdk
  * 邮箱：996489865@qq.com
- * TODO:一句话描述
+ * TODO:腾讯jni
  */
 
 public class WlxSdk {

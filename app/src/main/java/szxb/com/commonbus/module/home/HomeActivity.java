@@ -26,6 +26,7 @@ import szxb.com.commonbus.task.scan.LoopScanTask;
 import szxb.com.commonbus.task.settle.TimeSettleTask;
 import szxb.com.commonbus.util.comm.Config;
 import szxb.com.commonbus.util.comm.DateUtil;
+import szxb.com.commonbus.util.comm.ParamsUtil;
 import szxb.com.commonbus.util.comm.Utils;
 import szxb.com.commonbus.util.rx.RxBus;
 import szxb.com.commonbus.util.schedule.ThreadScheduledExecutorUtil;
@@ -224,7 +225,7 @@ public class HomeActivity extends BaseMvpActivity<HomePresenter> {
                     @Override
                     public void call(QRScanMessage qrScanMessage) {
                         if (qrScanMessage == null) return;
-                        Map<String, Object> map = PosRequest.requestMap(qrScanMessage.getPosRecord());
+                        Map<String, Object> map = ParamsUtil.requestMap(qrScanMessage.getPosRecord());
                         mPresenter.requestPost(Config.FETCH_DEBIT_WHAT, map, Config.XBPAY);
                     }
                 });

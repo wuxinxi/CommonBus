@@ -7,8 +7,8 @@ import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 
 import szxb.com.commonbus.R;
 import szxb.com.commonbus.base.BaseActivity;
+import szxb.com.commonbus.interfaces.InitOnListener;
 import szxb.com.commonbus.module.home.HomeActivity;
-import szxb.com.commonbus.module.home.InitOnListener;
 
 /**
  * 作者: Tangren on 2017/8/31

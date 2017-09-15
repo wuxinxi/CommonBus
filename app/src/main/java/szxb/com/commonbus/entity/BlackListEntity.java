@@ -17,10 +17,10 @@ public class BlackListEntity {
 
     private String open_id;
 
-    private String time;
+    private long time;
 
-    @Generated(hash = 757241027)
-    public BlackListEntity(Long id, String open_id, String time) {
+    @Generated(hash = 1839420203)
+    public BlackListEntity(Long id, String open_id, long time) {
         this.id = id;
         this.open_id = open_id;
         this.time = time;
@@ -46,13 +46,20 @@ public class BlackListEntity {
         this.open_id = open_id;
     }
 
-    public String getTime() {
+    public long getTime() {
         return this.time;
     }
 
-    public void setTime(String time) {
+    public void setTime(long time) {
         this.time = time;
     }
 
-
+    @Override
+    public String toString() {
+        return "BlackListEntity{" +
+                "id=" + id +
+                ", open_id='" + open_id + '\'' +
+                ", time=" + time +
+                '}';
+    }
 }

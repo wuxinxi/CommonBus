@@ -15,7 +15,7 @@ import szxb.com.commonbus.entity.QRScanMessage;
 
 public class RxBus {
 
-    private static volatile RxBus instance;//volatile 保证instance可见性 禁止指令重排
+    private static volatile RxBus instance;
     private final Subject<Object, Object> bus;
 
     private RxBus() {

@@ -83,7 +83,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
 
                             CommonSharedPreferences.put("busNo", noticeJosnObject.getString("bus_no"));
                             CommonSharedPreferences.put("snNo", noticeJosnObject.getString("pos_no"));
-                            CommonSharedPreferences.put("ticketPrice", ticketPrice);
+                            CommonSharedPreferences.put("ticketPrice", Utils.string2Integer(ticketPrice));
                             CommonSharedPreferences.put("startStationName", start_station);
                             CommonSharedPreferences.put("endStationName", end_station);
                             CommonSharedPreferences.put("lineName", line_name);
